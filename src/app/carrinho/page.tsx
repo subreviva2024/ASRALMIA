@@ -36,21 +36,26 @@ export default function CarrinhoPage() {
     setError("");
     setSubmitting(true);
     try {
-      const res = await fetch("/api/order", {
+      // Create Stripe Checkout Session → redirect to payment
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ customer: form, items, total }),
       });
       const data = await res.json();
       if (!res.ok || data.error) {
-        setError(data.error || "Erro ao processar encomenda. Tente novamente.");
+        setError(data.error || "Erro ao criar sessão de pagamento. Tente novamente.");
         setSubmitting(false);
         return;
       }
-      setOrderRef(data.orderRef || "");
-      setSubmitting(false);
-      setSuccess(true);
-      clear();
+      // Redirect to Stripe Checkout page
+      if (data.url) {
+        clear(); // clear cart before redirect
+        window.location.href = data.url;
+      } else {
+        setError("Erro: URL de pagamento não recebido.");
+        setSubmitting(false);
+      }
     } catch {
       setError("Erro de ligação. Verifique a sua internet e tente novamente.");
       setSubmitting(false);
@@ -315,8 +320,14 @@ export default function CarrinhoPage() {
                         marginTop: "4px",
                       }}
                     >
-                      {submitting ? "A enviar..." : "Confirmar Encomenda"}
+                      {submitting ? "A redirecionar..." : "Pagar com Cartão"}
                     </button>
+                    <p style={{
+                      fontFamily: "'Inter'", fontSize: "9px", color: "rgba(240,235,226,0.3)",
+                      textAlign: "center", marginTop: "8px", letterSpacing: "0.05em",
+                    }}>
+                      🔒 Pagamento seguro via Stripe · Visa, Mastercard, Apple Pay
+                    </p>
                     <button
                       type="button"
                       onClick={() => setShowForm(false)}
