@@ -1,0 +1,34 @@
+{
+  "name": "ASTRALMIA Bot",
+  "version": "1.0.0",
+  "description": "Sales assistant and supplier search bot for ASTRALMIA esoteric shop",
+  "agent": {
+    "soul": "./SOUL.md",
+    "agents": "./AGENTS.md",
+    "model": "claude-sonnet-4-5",
+    "temperature": 0.7,
+    "maxTokens": 2048
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "token": "${TELEGRAM_BOT_TOKEN}",
+      "webhook": "${WEBHOOK_URL}/api/bot/telegram"
+    },
+    "whatsapp": {
+      "enabled": false,
+      "token": "${WHATSAPP_TOKEN}",
+      "phoneId": "${WHATSAPP_PHONE_ID}"
+    }
+  },
+  "webhook": {
+    "port": 4000,
+    "path": "/webhook"
+  },
+  "features": {
+    "supplierSearch": true,
+    "horoscope": true,
+    "tarot": true,
+    "productCatalogue": true
+  }
+}

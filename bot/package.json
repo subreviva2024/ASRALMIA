@@ -1,0 +1,24 @@
+{
+  "name": "astralmia-bot",
+  "version": "2.0.0",
+  "description": "ASTRALMIA Sales Bot — Telegram + CJ Dropshipping API",
+  "main": "astralmia-bot.js",
+  "scripts": {
+    "start": "node astralmia-bot.js",
+    "start:caela": "node server.js",
+    "dev": "node --watch astralmia-bot.js",
+    "dev:caela": "node --watch server.js",
+    "test": "node -e \"require('./cj-client'); require('./product-manager'); require('./order-manager'); require('./horoscope'); require('./tarot-engine'); require('./messages'); require('./keyboards'); require('./analytics'); require('./cache'); console.log('✅ All modules OK')\"",
+    "deploy": "bash deploy.sh"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "cheerio": "^1.2.0",
+    "dotenv": "^17.3.1",
+    "grammy": "^1.40.0",
+    "node-cron": "^4.2.1"
+  }
+}

@@ -1,0 +1,606 @@
+{
+  "lastUpdate": "2026-02-24T22:25:04.146Z",
+  "markup": "2.8x",
+  "products": [
+    {
+      "id": "aliexpress-crystals-quartzo-rosa-polido-3cm",
+      "name": "Quartzo Rosa Polido 3cm",
+      "category": "cristais",
+      "salePrice": 19.99,
+      "marketPrice": 21.99,
+      "supplierPrice": 3.5,
+      "totalCost": 6,
+      "marginEur": 9.49,
+      "marginPct": 47,
+      "moq": 1,
+      "supplier": {
+        "id": "aliexpress-crystals",
+        "name": "AliExpress — Crystal Store",
+        "platform": "aliexpress.com",
+        "url": "https://aliexpress.com/wholesale?SearchText=healing+crystal",
+        "deliveryDays": {
+          "min": 12,
+          "max": 25
+        },
+        "rating": 4.6,
+        "promo": null
+      }
+    },
+    {
+      "id": "aliexpress-crystals-ametista-bruta-5cm",
+      "name": "Ametista Bruta 5cm",
+      "category": "cristais",
+      "salePrice": 21.99,
+      "marketPrice": 23.99,
+      "supplierPrice": 4.2,
+      "totalCost": 6.7,
+      "marginEur": 10.79,
+      "marginPct": 49,
+      "moq": 1,
+      "supplier": {
+        "id": "aliexpress-crystals",
+        "name": "AliExpress — Crystal Store",
+        "platform": "aliexpress.com",
+        "url": "https://aliexpress.com/wholesale?SearchText=healing+crystal",
+        "deliveryDays": {
+          "min": 12,
+          "max": 25
+        },
+        "rating": 4.6,
+        "promo": null
+      }
+    },
+    {
+      "id": "aliexpress-crystals-obsidiana-negra-esfera-4cm",
+      "name": "Obsidiana Negra Esfera 4cm",
+      "category": "cristais",
+      "salePrice": 26.99,
+      "marketPrice": 29.99,
+      "supplierPrice": 5.8,
+      "totalCost": 8.3,
+      "marginEur": 14.19,
+      "marginPct": 53,
+      "moq": 1,
+      "supplier": {
+        "id": "aliexpress-crystals",
+        "name": "AliExpress — Crystal Store",
+        "platform": "aliexpress.com",
+        "url": "https://aliexpress.com/wholesale?SearchText=healing+crystal",
+        "deliveryDays": {
+          "min": 12,
+          "max": 25
+        },
+        "rating": 4.6,
+        "promo": null
+      }
+    },
+    {
+      "id": "aliexpress-crystals-selenite-vara-20cm",
+      "name": "Selenite Vara 20cm",
+      "category": "cristais",
+      "salePrice": 17.99,
+      "marketPrice": 18.99,
+      "supplierPrice": 2.9,
+      "totalCost": 5.4,
+      "marginEur": 8.09,
+      "marginPct": 45,
+      "moq": 1,
+      "supplier": {
+        "id": "aliexpress-crystals",
+        "name": "AliExpress — Crystal Store",
+        "platform": "aliexpress.com",
+        "url": "https://aliexpress.com/wholesale?SearchText=healing+crystal",
+        "deliveryDays": {
+          "min": 12,
+          "max": 25
+        },
+        "rating": 4.6,
+        "promo": null
+      }
+    },
+    {
+      "id": "dhgate-crystals-labradorite-polida",
+      "name": "Labradorite Polida",
+      "category": "cristais",
+      "salePrice": 22.99,
+      "marketPrice": 24.99,
+      "supplierPrice": 6.5,
+      "totalCost": 7.14,
+      "marginEur": 11.35,
+      "marginPct": 49,
+      "moq": 5,
+      "supplier": {
+        "id": "dhgate-crystals",
+        "name": "DHgate — Crystal Wholesale",
+        "platform": "dhgate.com",
+        "url": "https://dhgate.com/wholesale/crystals.html",
+        "deliveryDays": {
+          "min": 14,
+          "max": 28
+        },
+        "rating": 4.4,
+        "promo": null
+      }
+    },
+    {
+      "id": "dhgate-crystals-pirita-cubo-natural",
+      "name": "Pirita Cubo Natural",
+      "category": "cristais",
+      "salePrice": 15.99,
+      "marketPrice": 16.99,
+      "supplierPrice": 4.1,
+      "totalCost": 4.74,
+      "marginEur": 6.75,
+      "marginPct": 42,
+      "moq": 5,
+      "supplier": {
+        "id": "dhgate-crystals",
+        "name": "DHgate — Crystal Wholesale",
+        "platform": "dhgate.com",
+        "url": "https://dhgate.com/wholesale/crystals.html",
+        "deliveryDays": {
+          "min": 14,
+          "max": 28
+        },
+        "rating": 4.4,
+        "promo": null
+      }
+    },
+    {
+      "id": "wholesale-crystals-uk-ametista-geode-pequena",
+      "name": "Ametista Geode Pequena",
+      "category": "cristais",
+      "salePrice": 34.99,
+      "marketPrice": 37.99,
+      "supplierPrice": 8.5,
+      "totalCost": 10.67,
+      "marginEur": 19.82,
+      "marginPct": 57,
+      "moq": 3,
+      "supplier": {
+        "id": "wholesale-crystals-uk",
+        "name": "Wholesale Crystal Supplier UK",
+        "platform": "wholesalecrystalsupplier.com",
+        "url": "https://wholesalecrystalsupplier.com",
+        "deliveryDays": {
+          "min": 5,
+          "max": 10
+        },
+        "rating": 4.8,
+        "promo": "10% desconto em encomendas acima de €100"
+      }
+    },
+    {
+      "id": "wholesale-crystals-uk-torre-de-selenite-10cm",
+      "name": "Torre de Selenite 10cm",
+      "category": "cristais",
+      "salePrice": 19.99,
+      "marketPrice": 21.99,
+      "supplierPrice": 4.8,
+      "totalCost": 6.1,
+      "marginEur": 9.39,
+      "marginPct": 47,
+      "moq": 5,
+      "supplier": {
+        "id": "wholesale-crystals-uk",
+        "name": "Wholesale Crystal Supplier UK",
+        "platform": "wholesalecrystalsupplier.com",
+        "url": "https://wholesalecrystalsupplier.com",
+        "deliveryDays": {
+          "min": 5,
+          "max": 10
+        },
+        "rating": 4.8,
+        "promo": "10% desconto em encomendas acima de €100"
+      }
+    },
+    {
+      "id": "aliexpress-tarot-rider-waite-tarot-78-cartas",
+      "name": "Rider Waite Tarot (78 cartas)",
+      "category": "tarot",
+      "salePrice": 27.99,
+      "marketPrice": 29.99,
+      "supplierPrice": 7.2,
+      "totalCost": 9.7,
+      "marginEur": 13.79,
+      "marginPct": 49,
+      "moq": 1,
+      "supplier": {
+        "id": "aliexpress-tarot",
+        "name": "AliExpress — Tarot Decks",
+        "platform": "aliexpress.com",
+        "url": "https://aliexpress.com/wholesale?SearchText=tarot+deck",
+        "deliveryDays": {
+          "min": 12,
+          "max": 22
+        },
+        "rating": 4.5,
+        "promo": "Frete grátis acima de €25"
+      }
+    },
+    {
+      "id": "aliexpress-tarot-tarot-marselha-clssico",
+      "name": "Tarot Marselha Clássico",
+      "category": "tarot",
+      "salePrice": 26.99,
+      "marketPrice": 27.99,
+      "supplierPrice": 6.8,
+      "totalCost": 9.3,
+      "marginEur": 13.19,
+      "marginPct": 49,
+      "moq": 1,
+      "supplier": {
+        "id": "aliexpress-tarot",
+        "name": "AliExpress — Tarot Decks",
+        "platform": "aliexpress.com",
+        "url": "https://aliexpress.com/wholesale?SearchText=tarot+deck",
+        "deliveryDays": {
+          "min": 12,
+          "max": 22
+        },
+        "rating": 4.5,
+        "promo": "Frete grátis acima de €25"
+      }
+    },
+    {
+      "id": "aliexpress-tarot-oracle-cards-44-cartas",
+      "name": "Oracle Cards 44 cartas",
+      "category": "tarot",
+      "salePrice": 33.99,
+      "marketPrice": 36.99,
+      "supplierPrice": 9.5,
+      "totalCost": 12,
+      "marginEur": 17.49,
+      "marginPct": 51,
+      "moq": 1,
+      "supplier": {
+        "id": "aliexpress-tarot",
+        "name": "AliExpress — Tarot Decks",
+        "platform": "aliexpress.com",
+        "url": "https://aliexpress.com/wholesale?SearchText=tarot+deck",
+        "deliveryDays": {
+          "min": 12,
+          "max": 22
+        },
+        "rating": 4.5,
+        "promo": "Frete grátis acima de €25"
+      }
+    },
+    {
+      "id": "dhgate-tarot-thoth-tarot-deck",
+      "name": "Thoth Tarot Deck",
+      "category": "tarot",
+      "salePrice": 30.99,
+      "marketPrice": 32.99,
+      "supplierPrice": 10.2,
+      "totalCost": 10.84,
+      "marginEur": 15.65,
+      "marginPct": 51,
+      "moq": 5,
+      "supplier": {
+        "id": "dhgate-tarot",
+        "name": "DHgate — Tarot Wholesale",
+        "platform": "dhgate.com",
+        "url": "https://dhgate.com/wholesale/tarot+cards.html",
+        "deliveryDays": {
+          "min": 14,
+          "max": 25
+        },
+        "rating": 4.3,
+        "promo": null
+      }
+    },
+    {
+      "id": "mystic-moments-incense-palo-santo-varinhas-10un",
+      "name": "Palo Santo Varinhas 10un",
+      "category": "incenso",
+      "salePrice": 17.99,
+      "marketPrice": 18.99,
+      "supplierPrice": 3.5,
+      "totalCost": 4.5,
+      "marginEur": 8.99,
+      "marginPct": 50,
+      "moq": 5,
+      "supplier": {
+        "id": "mystic-moments-incense",
+        "name": "Mystic Moments UK",
+        "platform": "mysticmoments.co.uk",
+        "url": "https://www.mysticmoments.co.uk",
+        "deliveryDays": {
+          "min": 4,
+          "max": 8
+        },
+        "rating": 4.9,
+        "promo": null
+      }
+    },
+    {
+      "id": "ankorstore-incense-incenso-meditation-blend-120g",
+      "name": "Incenso Meditation Blend 120g",
+      "category": "incenso",
+      "salePrice": 12.99,
+      "marketPrice": 13.99,
+      "supplierPrice": 2.5,
+      "totalCost": 3.25,
+      "marginEur": 5.24,
+      "marginPct": 40,
+      "moq": 6,
+      "supplier": {
+        "id": "ankorstore-incense",
+        "name": "Ankorstore EU — Incenso",
+        "platform": "ankorstore.com",
+        "url": "https://ankorstore.com/search?query=incense",
+        "deliveryDays": {
+          "min": 3,
+          "max": 6
+        },
+        "rating": 4.7,
+        "promo": "Primeira encomenda sem frete mínimo"
+      }
+    },
+    {
+      "id": "ankorstore-candles-vela-de-soja-aromatizada-150g",
+      "name": "Vela de Soja Aromatizada 150g",
+      "category": "velas",
+      "salePrice": 14.99,
+      "marketPrice": 15.99,
+      "supplierPrice": 3.8,
+      "totalCost": 4.55,
+      "marginEur": 5.94,
+      "marginPct": 40,
+      "moq": 6,
+      "supplier": {
+        "id": "ankorstore-candles",
+        "name": "Ankorstore EU — Velas",
+        "platform": "ankorstore.com",
+        "url": "https://ankorstore.com/search?query=candles+ritual",
+        "deliveryDays": {
+          "min": 3,
+          "max": 6
+        },
+        "rating": 4.7,
+        "promo": null
+      }
+    },
+    {
+      "id": "ankorstore-candles-vela-colorida-pack-7-chakras",
+      "name": "Vela Colorida Pack 7 Chakras",
+      "category": "velas",
+      "salePrice": 21.99,
+      "marketPrice": 23.99,
+      "supplierPrice": 5.5,
+      "totalCost": 6.63,
+      "marginEur": 10.86,
+      "marginPct": 49,
+      "moq": 4,
+      "supplier": {
+        "id": "ankorstore-candles",
+        "name": "Ankorstore EU — Velas",
+        "platform": "ankorstore.com",
+        "url": "https://ankorstore.com/search?query=candles+ritual",
+        "deliveryDays": {
+          "min": 3,
+          "max": 6
+        },
+        "rating": 4.7,
+        "promo": null
+      }
+    },
+    {
+      "id": "faire-candles-vela-cera-de-abelha-ritual-200g",
+      "name": "Vela Cera de Abelha Ritual 200g",
+      "category": "velas",
+      "salePrice": 24.99,
+      "marketPrice": 26.99,
+      "supplierPrice": 6.2,
+      "totalCost": 7.7,
+      "marginEur": 12.79,
+      "marginPct": 51,
+      "moq": 4,
+      "supplier": {
+        "id": "faire-candles",
+        "name": "Faire EU — Velas Artesanais",
+        "platform": "faire.com",
+        "url": "https://faire.com/search?q=ritual+candles",
+        "deliveryDays": {
+          "min": 5,
+          "max": 10
+        },
+        "rating": 4.8,
+        "promo": null
+      }
+    },
+    {
+      "id": "faire-candles-vela-lua-cheia-lavanda",
+      "name": "Vela Lua Cheia Lavanda",
+      "category": "velas",
+      "salePrice": 30.99,
+      "marketPrice": 33.99,
+      "supplierPrice": 7.5,
+      "totalCost": 9.5,
+      "marginEur": 16.99,
+      "marginPct": 55,
+      "moq": 3,
+      "supplier": {
+        "id": "faire-candles",
+        "name": "Faire EU — Velas Artesanais",
+        "platform": "faire.com",
+        "url": "https://faire.com/search?q=ritual+candles",
+        "deliveryDays": {
+          "min": 5,
+          "max": 10
+        },
+        "rating": 4.8,
+        "promo": null
+      }
+    },
+    {
+      "id": "aliexpress-books-livro-astrologia-para-iniciantes",
+      "name": "Livro Astrologia para Iniciantes",
+      "category": "livros",
+      "salePrice": 18.99,
+      "marketPrice": 17.99,
+      "supplierPrice": 4.5,
+      "totalCost": 7,
+      "marginEur": 7.49,
+      "marginPct": 39,
+      "moq": 1,
+      "supplier": {
+        "id": "aliexpress-books",
+        "name": "AliExpress — Livros Esotéricos",
+        "platform": "aliexpress.com",
+        "url": "https://aliexpress.com/wholesale?SearchText=astrology+book",
+        "deliveryDays": {
+          "min": 15,
+          "max": 30
+        },
+        "rating": 4.2,
+        "promo": null
+      }
+    },
+    {
+      "id": "aliexpress-books-guia-completo-de-tarot",
+      "name": "Guia Completo de Tarot",
+      "category": "livros",
+      "salePrice": 25.99,
+      "marketPrice": 23.99,
+      "supplierPrice": 6.8,
+      "totalCost": 9.3,
+      "marginEur": 12.19,
+      "marginPct": 47,
+      "moq": 1,
+      "supplier": {
+        "id": "aliexpress-books",
+        "name": "AliExpress — Livros Esotéricos",
+        "platform": "aliexpress.com",
+        "url": "https://aliexpress.com/wholesale?SearchText=astrology+book",
+        "deliveryDays": {
+          "min": 15,
+          "max": 30
+        },
+        "rating": 4.2,
+        "promo": null
+      }
+    },
+    {
+      "id": "aliexpress-jewelry-pendente-ametista-prata-925",
+      "name": "Pendente Ametista Prata 925",
+      "category": "joias",
+      "salePrice": 33.99,
+      "marketPrice": 36.99,
+      "supplierPrice": 5.5,
+      "totalCost": 8,
+      "marginEur": 21.49,
+      "marginPct": 63,
+      "moq": 1,
+      "supplier": {
+        "id": "aliexpress-jewelry",
+        "name": "AliExpress — Joias Esotéricas",
+        "platform": "aliexpress.com",
+        "url": "https://aliexpress.com/wholesale?SearchText=crystal+jewelry+esoteric",
+        "deliveryDays": {
+          "min": 12,
+          "max": 22
+        },
+        "rating": 4.5,
+        "promo": "Compra 2 leva 3 em pulseiras"
+      }
+    },
+    {
+      "id": "aliexpress-jewelry-pulseira-quartzo-rosa",
+      "name": "Pulseira Quartzo Rosa",
+      "category": "joias",
+      "salePrice": 23.99,
+      "marketPrice": 25.99,
+      "supplierPrice": 3.2,
+      "totalCost": 5.7,
+      "marginEur": 13.79,
+      "marginPct": 57,
+      "moq": 1,
+      "supplier": {
+        "id": "aliexpress-jewelry",
+        "name": "AliExpress — Joias Esotéricas",
+        "platform": "aliexpress.com",
+        "url": "https://aliexpress.com/wholesale?SearchText=crystal+jewelry+esoteric",
+        "deliveryDays": {
+          "min": 12,
+          "max": 22
+        },
+        "rating": 4.5,
+        "promo": "Compra 2 leva 3 em pulseiras"
+      }
+    },
+    {
+      "id": "aliexpress-jewelry-brincos-lua-prata",
+      "name": "Brincos Lua Prata",
+      "category": "joias",
+      "salePrice": 29.99,
+      "marketPrice": 32.99,
+      "supplierPrice": 4.8,
+      "totalCost": 7.3,
+      "marginEur": 18.19,
+      "marginPct": 61,
+      "moq": 1,
+      "supplier": {
+        "id": "aliexpress-jewelry",
+        "name": "AliExpress — Joias Esotéricas",
+        "platform": "aliexpress.com",
+        "url": "https://aliexpress.com/wholesale?SearchText=crystal+jewelry+esoteric",
+        "deliveryDays": {
+          "min": 12,
+          "max": 22
+        },
+        "rating": 4.5,
+        "promo": "Compra 2 leva 3 em pulseiras"
+      }
+    },
+    {
+      "id": "dhgate-jewelry-colar-olho-de-tigre-dourado",
+      "name": "Colar Olho de Tigre Dourado",
+      "category": "joias",
+      "salePrice": 30.99,
+      "marketPrice": 33.99,
+      "supplierPrice": 6.8,
+      "totalCost": 7.44,
+      "marginEur": 19.05,
+      "marginPct": 61,
+      "moq": 5,
+      "supplier": {
+        "id": "dhgate-jewelry",
+        "name": "DHgate — Joias Grosso",
+        "platform": "dhgate.com",
+        "url": "https://dhgate.com/wholesale/crystal+jewelry.html",
+        "deliveryDays": {
+          "min": 14,
+          "max": 28
+        },
+        "rating": 4.4,
+        "promo": null
+      }
+    },
+    {
+      "id": "dhgate-jewelry-anel-ajustvel-cristal",
+      "name": "Anel Ajustável Cristal",
+      "category": "joias",
+      "salePrice": 13.99,
+      "marketPrice": 14.99,
+      "supplierPrice": 2.9,
+      "totalCost": 3.22,
+      "marginEur": 6.27,
+      "marginPct": 45,
+      "moq": 10,
+      "supplier": {
+        "id": "dhgate-jewelry",
+        "name": "DHgate — Joias Grosso",
+        "platform": "dhgate.com",
+        "url": "https://dhgate.com/wholesale/crystal+jewelry.html",
+        "deliveryDays": {
+          "min": 14,
+          "max": 28
+        },
+        "rating": 4.4,
+        "promo": null
+      }
+    }
+  ]
+}

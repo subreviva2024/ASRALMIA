@@ -1,0 +1,286 @@
+@import "tailwindcss";
+@import "@fontsource/cormorant-garamond/300.css";
+@import "@fontsource/cormorant-garamond/400.css";
+@import "@fontsource/cormorant-garamond/500.css";
+@import "@fontsource/cormorant-garamond/600.css";
+@import "@fontsource/cormorant-garamond/700.css";
+@import "@fontsource/inter/300.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+
+@theme {
+  --color-obsidian: #08080f;
+  --color-ink: #0d0d18;
+  --color-surface: #13131f;
+  --color-border: rgba(255,255,255,0.07);
+  --color-gold: #c9a84c;
+  --color-gold-light: #e8cc80;
+  --color-gold-muted: rgba(201,168,76,0.15);
+  --color-cream: #f0ebe2;
+  --color-muted: rgba(240,235,226,0.45);
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #08080f;
+  color: #f0ebe2;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(201,168,76,0.25);
+  color: #f0ebe2;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #08080f; }
+::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.6); }
+
+/* Typography utilities */
+.font-display { font-family: "Cormorant Garamond", Georgia, serif; }
+.font-sans { font-family: "Inter", system-ui, sans-serif; }
+
+.text-gold { color: #c9a84c; }
+.text-muted { color: rgba(240,235,226,0.45); }
+.text-cream { color: #f0ebe2; }
+
+/* Gold gradient text */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #a07825 0%, #e8cc80 40%, #c9a84c 60%, #9a6e20 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Thin gold line divider */
+.divider-gold {
+  display: block;
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c9a84c, transparent);
+  margin: 0 auto;
+}
+
+/* Glass panel */
+.panel {
+  background: rgba(13,13,24,0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.07);
+}
+
+/* Product card hover effect */
+.product-card {
+  position: relative;
+  overflow: hidden;
+  background: #13131f;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.product-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  transition: border-color 0.4s ease;
+  pointer-events: none;
+}
+.product-card:hover {
+  transform: translateY(-4px);
+}
+.product-card:hover::after {
+  border-color: rgba(201,168,76,0.35);
+}
+
+/* Elegant button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 36px;
+  background: linear-gradient(135deg, #a07825, #e8cc80, #a07825);
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  color: #08080f;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: background-position 0.5s ease, transform 0.3s ease;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background-position: 0 0;
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 35px;
+  border: 1px solid rgba(201,168,76,0.4);
+  color: #f0ebe2;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+}
+.btn-ghost:hover {
+  border-color: #c9a84c;
+  color: #c9a84c;
+  background: rgba(201,168,76,0.05);
+}
+
+/* Subtle noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Animações espirituais ─────────────────────────── */
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.12; transform: scale(0.7); }
+  50%       { opacity: 1;    transform: scale(1.4); }
+}
+
+@keyframes float-symbol {
+  0%, 100% { transform: translateY(0px) rotate(0deg);   opacity: 0.35; }
+  50%       { transform: translateY(-18px) rotate(6deg); opacity: 0.75; }
+}
+
+@keyframes pulse-aura {
+  0%, 100% { opacity: 0.04; transform: translate(-50%,-50%) scale(1); }
+  50%       { opacity: 0.14; transform: translate(-50%,-50%) scale(1.1); }
+}
+
+@keyframes rotate-ring {
+  from { transform: translate(-50%,-50%) rotate(0deg); }
+  to   { transform: translate(-50%,-50%) rotate(360deg); }
+}
+
+@keyframes rotate-ring-reverse {
+  from { transform: translate(-50%,-50%) rotate(0deg); }
+  to   { transform: translate(-50%,-50%) rotate(-360deg); }
+}
+
+@keyframes shimmer-gold {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes drift {
+  0%   { transform: translate(0px, 0px); }
+  33%  { transform: translate(6px, -10px); }
+  66%  { transform: translate(-4px, 5px); }
+  100% { transform: translate(0px, 0px); }
+}
+
+/* Gradient text animado dourado */
+.text-shimmer {
+  background: linear-gradient(90deg, #9a6e20, #e8cc80, #c9a84c, #e8cc80, #9a6e20);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-gold 6s linear infinite;
+}
+
+/* Estrelinhas do hero */
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #f0ebe2;
+  animation: twinkle var(--dur, 3s) ease-in-out infinite var(--del, 0s);
+  will-change: opacity, transform;
+}
+
+/* Símbolo flutuante */
+.float-symbol {
+  animation: float-symbol var(--dur, 7s) ease-in-out infinite var(--del, 0s);
+  will-change: transform, opacity;
+}
+
+/* Anel girante da geometria sagrada */
+.ring-rotate {
+  position: absolute;
+  top: 50%; left: 50%;
+  border-radius: 50%;
+  animation: rotate-ring var(--speed, 25s) linear infinite;
+}
+.ring-rotate-rev {
+  position: absolute;
+  top: 50%; left: 50%;
+  border-radius: 50%;
+  animation: rotate-ring-reverse var(--speed, 35s) linear infinite;
+}
+
+/* Card dos elementos espirituais */
+.element-card {
+  background: rgba(13,13,24,0.7);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 48px 36px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.4s ease, background 0.4s ease;
+}
+.element-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent,#c9a84c), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.element-card:hover { border-color: rgba(255,255,255,0.12); background: rgba(20,20,36,0.85); }
+.element-card:hover::before { opacity: 1; }
+
+/* ── Responsive grids ──────────────────────────── */
+@media (max-width: 768px) {
+  .grid-single-col {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+  .compat-layout {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+  .compat-layout > div:nth-child(2) {
+    display: none !important;
+  }
+  .compat-result-layout {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+}
