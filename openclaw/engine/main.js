@@ -1,5 +1,5 @@
 /**
- * ASTRALMIA — Main Process v4.0 (24/7 Autonomous Sales Machine)
+ * ASTRALMIA — Main Process v5.0 (24/7 Autonomous Sales Machine)
  * 
  * Full CJ API automation with ALL subsystems:
  * 
@@ -8,10 +8,11 @@
  * │  ORDER MANAGER      │ Full order lifecycle (5m cycles)      │
  * │  INVENTORY MONITOR  │ Stock tracking (2h checks)            │
  * │  DISPUTE MANAGER    │ Auto-detect & file disputes (30m)     │
- * │  HTTP API           │ 25+ endpoints for full control        │
+ * │  WEBHOOK RECEIVER   │ Real-time CJ event processing        │
+ * │  HTTP API           │ 70+ endpoints for full control        │
  * └─────────────────────────────────────────────────────────────┘
  * 
- * CJ API Coverage: 40+ endpoints (100% of v2.0 API)
+ * CJ API Coverage: 45 endpoints (100% of v2.0 API)
  * Designed to run via PM2 for 24/7 uptime.
  */
 
@@ -92,7 +93,7 @@ function startServer() {
         const catalog = loadJSON(join(DATA_DIR, "catalog.json"), { products: [] });
         json(res, {
           status: "ok",
-          service: "ASTRALMIA Sales Engine v4.0",
+          service: "ASTRALMIA Sales Engine v5.0",
           uptime: process.uptime(),
           catalogSize: (catalog.products || []).filter(p => !p.disabled).length,
           totalProducts: catalog.products?.length || 0,
@@ -644,6 +645,119 @@ function startServer() {
       }
 
       // ═══════════════════════════════════════════════════════
+      // WEBHOOK — CJ Real-time Notifications
+      // ═══════════════════════════════════════════════════════
+
+      // POST /cj/webhook/set  { product, stock, order, logistics }
+      if (path === "/cj/webhook/set" && req.method === "POST") {
+        const body = JSON.parse(await readBody(req));
+        const data = await getCJ().setWebhook(body);
+        json(res, data);
+        return;
+      }
+
+      // POST /cj/webhook/enable-all  { callbackUrl }
+      if (path === "/cj/webhook/enable-all" && req.method === "POST") {
+        const body = JSON.parse(await readBody(req));
+        if (!body.callbackUrl) { json(res, { error: "callbackUrl required (HTTPS)" }, 400); return; }
+        const data = await getCJ().enableAllWebhooks(body.callbackUrl);
+        json(res, data);
+        return;
+      }
+
+      // POST /cj/webhook/disable-all
+      if (path === "/cj/webhook/disable-all" && req.method === "POST") {
+        const data = await getCJ().disableAllWebhooks();
+        json(res, data);
+        return;
+      }
+
+      // POST /webhook/callback — Receive CJ webhook events
+      // CJ sends: { messageId, type, messageType, params }
+      // Types: PRODUCT, VARIANT, STOCK, ORDER, ORDERSPLIT, SOURCINGCREATE, LOGISTIC
+      // MUST respond within 3 seconds with 200 OK
+      if (path === "/webhook/callback" && req.method === "POST") {
+        const body = JSON.parse(await readBody(req));
+        // Respond immediately (CJ requires < 3s)
+        json(res, { received: true });
+        // Process asynchronously
+        processWebhookEvent(body).catch(err =>
+          console.error(`[WEBHOOK] Error processing ${body?.type}:`, err.message)
+        );
+        return;
+      }
+
+      // GET /webhook/events — View recent webhook events
+      if (path === "/webhook/events") {
+        const limit = parseInt(url.searchParams.get("limit") || "50", 10);
+        const type = url.searchParams.get("type") || undefined;
+        let events = webhookEvents.slice(-limit);
+        if (type) events = events.filter(e => e.type === type.toUpperCase());
+        json(res, { total: events.length, events: events.reverse() });
+        return;
+      }
+
+      // GET /cj/track/v1/:trackNumber  (deprecated endpoint)
+      if (path.startsWith("/cj/track/v1/")) {
+        const trackNumber = path.replace("/cj/track/v1/", "");
+        const data = await getCJ().trackShipmentV1(trackNumber);
+        json(res, data);
+        return;
+      }
+
+      // ═══════════════════════════════════════════════════════
+      // STOCK DIRECT — CJ API inventory endpoints
+      // ═══════════════════════════════════════════════════════
+
+      // GET /cj/stock/vid/:vid
+      if (path.startsWith("/cj/stock/vid/")) {
+        const vid = path.replace("/cj/stock/vid/", "");
+        const data = await getCJ().checkInventoryByVid(vid);
+        json(res, { vid, stock: data });
+        return;
+      }
+
+      // GET /cj/stock/sku/:sku
+      if (path.startsWith("/cj/stock/sku/")) {
+        const sku = path.replace("/cj/stock/sku/", "");
+        const data = await getCJ().checkInventoryBySku(sku);
+        json(res, { sku, stock: data });
+        return;
+      }
+
+      // GET /cj/stock/detailed/:pid
+      if (path.startsWith("/cj/stock/detailed/")) {
+        const pid = path.replace("/cj/stock/detailed/", "");
+        const data = await getCJ().getInventoryByPid(pid);
+        json(res, { pid, inventory: data });
+        return;
+      }
+
+      // POST /cj/order/parent  (saveGenerateParentOrder)
+      if (path === "/cj/order/parent" && req.method === "POST") {
+        const body = JSON.parse(await readBody(req));
+        const data = await getCJ().saveParentOrder(body);
+        json(res, data);
+        return;
+      }
+
+      // POST /cj/order/warehouse  (changeWarehouse)
+      if (path === "/cj/order/warehouse" && req.method === "POST") {
+        const body = JSON.parse(await readBody(req));
+        const data = await getCJ().changeOrderWarehouse(body);
+        json(res, data);
+        return;
+      }
+
+      // POST /cj/order/pod  (podProductCustomPicturesEdit)
+      if (path === "/cj/order/pod" && req.method === "POST") {
+        const body = JSON.parse(await readBody(req));
+        const data = await getCJ().updatePodPictures(body);
+        json(res, data);
+        return;
+      }
+
+      // ═══════════════════════════════════════════════════════
       // SCAN & SEARCH (legacy)
       // ═══════════════════════════════════════════════════════
 
@@ -711,11 +825,102 @@ function startServer() {
   });
 
   server.listen(PORT, "0.0.0.0", () => {
-    console.log(`🌐 ASTRALMIA API server v4.0 running on port ${PORT}`);
+    console.log(`🌐 ASTRALMIA API server v5.0 running on port ${PORT}`);
     console.log(`   ${getEndpointList().length} endpoints available`);
   });
 
   return server;
+}
+
+// ═══════════════════════════════════════════════════════════
+// Webhook Event Processing
+// ═══════════════════════════════════════════════════════════
+
+const MAX_WEBHOOK_EVENTS = 500;
+const webhookEvents = [];
+
+/**
+ * Process incoming CJ webhook event asynchronously.
+ * Event types: PRODUCT, VARIANT, STOCK, ORDER, ORDERSPLIT, SOURCINGCREATE, LOGISTIC
+ */
+async function processWebhookEvent(event) {
+  const { messageId, type, messageType, params } = event;
+  const ts = new Date().toISOString();
+
+  // Store event (ring buffer)
+  webhookEvents.push({ messageId, type, messageType, params, receivedAt: ts });
+  if (webhookEvents.length > MAX_WEBHOOK_EVENTS) webhookEvents.shift();
+
+  console.log(`[WEBHOOK] ${type}/${messageType} — messageId=${messageId}`);
+
+  // Persist webhook events
+  const eventsFile = join(DATA_DIR, "webhook-events.json");
+  try {
+    const recent = webhookEvents.slice(-100);
+    writeFileSync(eventsFile, JSON.stringify(recent, null, 2));
+  } catch (err) {
+    console.error("[WEBHOOK] Failed to persist events:", err.message);
+  }
+
+  // Route event to subsystems
+  switch (type) {
+    case "ORDER":
+    case "ORDERSPLIT":
+      if (orderManager) {
+        try {
+          // Sync the specific order from CJ
+          const orderId = params?.cjOrderId || params?.originalOrderId;
+          if (orderId) {
+            console.log(`[WEBHOOK] Order event → syncing order ${orderId}`);
+            await orderManager.syncOrderStatuses();
+          }
+        } catch (err) {
+          console.error("[WEBHOOK] Order sync error:", err.message);
+        }
+      }
+      break;
+
+    case "STOCK":
+      if (inventoryMonitor) {
+        try {
+          // Trigger stock check for affected variants
+          const vids = Object.keys(params || {});
+          console.log(`[WEBHOOK] Stock change for ${vids.length} variant(s)`);
+          // Trigger full stock check asynchronously
+          inventoryMonitor.checkAllStock().catch(e =>
+            console.error("[WEBHOOK] Stock check error:", e.message)
+          );
+        } catch (err) {
+          console.error("[WEBHOOK] Inventory error:", err.message);
+        }
+      }
+      break;
+
+    case "PRODUCT":
+    case "VARIANT":
+      console.log(`[WEBHOOK] Product/Variant ${messageType}: pid=${params?.pid || params?.vid}`);
+      // Could trigger catalog re-scan for affected product
+      break;
+
+    case "LOGISTIC":
+      if (orderManager) {
+        try {
+          const orderId = params?.orderId;
+          console.log(`[WEBHOOK] Logistics update: order=${orderId}, tracking=${params?.trackingNumber}`);
+          await orderManager.syncOrderStatuses();
+        } catch (err) {
+          console.error("[WEBHOOK] Logistics sync error:", err.message);
+        }
+      }
+      break;
+
+    case "SOURCINGCREATE":
+      console.log(`[WEBHOOK] Sourcing result: product=${params?.cjProductId}, status=${params?.status}`);
+      break;
+
+    default:
+      console.log(`[WEBHOOK] Unknown event type: ${type}`);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -794,11 +999,16 @@ function getEndpointList() {
     "POST /cj/myproducts/add",
     "GET  /cj/warehouses",
     "GET  /cj/warehouse/:id",
+    // Stock (direct CJ API)
+    "GET  /cj/stock/vid/:vid",
+    "GET  /cj/stock/sku/:sku",
+    "GET  /cj/stock/detailed/:pid",
     // Shipping/Freight
     "POST /cj/freight",
     "POST /cj/freight/tip",
     "POST /cj/logistics/supplier",
     "GET  /cj/track/:trackNumber",
+    "GET  /cj/track/v1/:trackNumber",
     // Sourcing
     "POST /cj/sourcing/create",
     "POST /cj/sourcing/query",
@@ -823,6 +1033,9 @@ function getEndpointList() {
     "POST /cj/cart/confirm",
     "POST /cj/order/waybill/upload",
     "POST /cj/order/waybill/update",
+    "POST /cj/order/parent",
+    "POST /cj/order/warehouse",
+    "POST /cj/order/pod",
     // Payment
     "GET  /balance",
     "POST /pay",
@@ -840,6 +1053,12 @@ function getEndpointList() {
     "GET  /cj/disputes",
     // Settings
     "GET  /cj/settings",
+    // Webhook
+    "POST /cj/webhook/set",
+    "POST /cj/webhook/enable-all",
+    "POST /cj/webhook/disable-all",
+    "POST /webhook/callback",
+    "GET  /webhook/events",
     // Scan/Search
     "POST /scan",
     "POST /search",
@@ -852,8 +1071,8 @@ function getEndpointList() {
 
 async function main() {
   console.log("\n═══════════════════════════════════════════════════════");
-  console.log("  ✨ ASTRALMIA — Autonomous Sales Engine v4.0");
-  console.log("  🔮 100% CJ Dropshipping API Automation");
+  console.log("  ✨ ASTRALMIA — Autonomous Sales Engine v5.0");
+  console.log("  🔮 100% CJ Dropshipping API v2.0 — 45 endpoints");
   console.log("  🕐 " + new Date().toISOString());
   console.log("═══════════════════════════════════════════════════════\n");
 

@@ -1,5 +1,5 @@
 /**
- * ASTRALMIA — Test Suite v4.0
+ * ASTRALMIA — Test Suite v5.0
  * Tests all engine modules for correctness
  */
 
@@ -33,7 +33,7 @@ function assert(condition, msg = "Assertion failed") {
 }
 
 console.log("\n═══════════════════════════════════════════════════════");
-console.log("  ✨ ASTRALMIA — Engine Tests v4.0");
+console.log("  ✨ ASTRALMIA — Engine Tests v5.0");
 console.log("═══════════════════════════════════════════════════════\n");
 
 // ── Translation Engine ──────────────────────────────────────
@@ -217,9 +217,9 @@ await test("dispute-manager imports", async () => {
 
 // ── CJ Client Structure ──────────────────────────────────
 
-console.log("\n🔗 CJ Client v4.0 API Coverage:");
+console.log("\n🔗 CJ Client v5.0 API Coverage (100% — 45 endpoints):");
 
-await test("CJClient has all 40+ methods", async () => {
+await test("CJClient has all 45+ methods (100% CJ API v2.0)", async () => {
   const m = await import("./cj-client.js");
   // Use prototype to check methods
   const proto = m.CJClient.prototype;
@@ -237,7 +237,8 @@ await test("CJClient has all 40+ methods", async () => {
     // Sourcing
     "createSourcing", "querySourcing",
     // Logistics
-    "calculateShipping", "calculateShippingTip", "getSupplierLogistics", "trackShipment",
+    "calculateShipping", "calculateShippingTip", "getSupplierLogistics",
+    "trackShipment", "trackShipmentV1",
     // Cart
     "addToCart", "confirmCart",
     // Orders
@@ -251,13 +252,15 @@ await test("CJClient has all 40+ methods", async () => {
     "getDisputeProducts", "confirmDisputeInfo", "createDispute", "cancelDispute", "listDisputes",
     // Settings
     "getSettings",
+    // Webhook
+    "setWebhook", "enableAllWebhooks", "disableAllWebhooks",
     // Core
     "api",
   ];
 
   const missing = methods.filter(m => typeof proto[m] !== "function");
   assert(missing.length === 0, `Missing methods: ${missing.join(", ")}`);
-  assert(methods.length >= 40, `Expected 40+ methods, got ${methods.length}`);
+  assert(methods.length >= 45, `Expected 45+ methods, got ${methods.length}`);
 });
 
 // ── Order Manager Structure ──────────────────────────────

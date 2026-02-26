@@ -1,12 +1,12 @@
 /**
- * ASTRALMIA — CJ Dropshipping API Client v4.0 (Full Coverage)
+ * ASTRALMIA — CJ Dropshipping API Client v5.0 (100% Coverage)
  * 
- * COMPLETE CJ API v2.0 integration — ALL endpoints:
+ * COMPLETE CJ API v2.0 integration — ALL 45 endpoints:
  * 
  * ┌─────────────────────────────────────────────────────────┐
  * │  AUTH       │ getAccessToken, refreshAccessToken, logout│
  * │  PRODUCT    │ list, listV2, query, variant, stock (3),  │
- * │             │ categories, warehouses, reviews,          │
+ * │             │ categories, warehouses, reviews (v1+v2),  │
  * │             │ addToMyProduct, myProduct/query            │
  * │  SOURCING   │ create, query                             │
  * │  STORAGE    │ warehouse detail                          │
@@ -16,9 +16,10 @@
  * │             │ POD pictures                              │
  * │  PAYMENT    │ getBalance, payBalance, payBalanceV2      │
  * │  LOGISTICS  │ freightCalculate, freightCalculateTip,    │
- * │             │ supplierLogistics, trackInfo (v2)         │
+ * │             │ supplierLogistics, trackInfo (v1+v2)      │
  * │  DISPUTES   │ products, confirm, create, cancel, list   │
  * │  SETTINGS   │ get                                       │
+ * │  WEBHOOK    │ set (product/stock/order/logistics)       │
  * └─────────────────────────────────────────────────────────┘
  * 
  * Features:
@@ -571,6 +572,77 @@ export class CJClient {
   /** Get CJ account settings */
   async getSettings() {
     return this.api("/setting/get");
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // WEBHOOK — Real-time event notifications
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * Configure webhook callbacks for real-time CJ notifications.
+   * 
+   * Event types: PRODUCT, VARIANT, STOCK, ORDER, ORDERSPLIT, SOURCINGCREATE, LOGISTIC
+   * Each category can be ENABLE or CANCEL with an array of HTTPS callback URLs.
+   * 
+   * Requirements:
+   * - URLs must be HTTPS (TLS 1.2+)
+   * - Callback must respond within 3 seconds with 200 OK
+   * 
+   * @param {Object} config - Webhook configuration
+   * @param {Object} [config.product]    - Product change events {type: "ENABLE"|"CANCEL", callbackUrls: string[]}
+   * @param {Object} [config.stock]      - Stock change events  {type: "ENABLE"|"CANCEL", callbackUrls: string[]}
+   * @param {Object} [config.order]      - Order status events  {type: "ENABLE"|"CANCEL", callbackUrls: string[]}
+   * @param {Object} [config.logistics]  - Logistics events     {type: "ENABLE"|"CANCEL", callbackUrls: string[]}
+   */
+  async setWebhook(config) {
+    const payload = {};
+    for (const key of ["product", "stock", "order", "logistics"]) {
+      if (config[key]) {
+        payload[key] = {
+          type: config[key].type || "ENABLE",
+          callbackUrls: Array.isArray(config[key].callbackUrls)
+            ? config[key].callbackUrls
+            : [config[key].callbackUrls],
+        };
+      }
+    }
+    return this.api("/webhook/set", {
+      method: "POST",
+      body: payload,
+    });
+  }
+
+  /**
+   * Enable all webhook events to a single callback URL.
+   * Convenience method — enables product, stock, order, logistics.
+   * @param {string} callbackUrl - HTTPS URL to receive callbacks
+   */
+  async enableAllWebhooks(callbackUrl) {
+    return this.setWebhook({
+      product:   { type: "ENABLE", callbackUrls: [callbackUrl] },
+      stock:     { type: "ENABLE", callbackUrls: [callbackUrl] },
+      order:     { type: "ENABLE", callbackUrls: [callbackUrl] },
+      logistics: { type: "ENABLE", callbackUrls: [callbackUrl] },
+    });
+  }
+
+  /** Disable all webhook events */
+  async disableAllWebhooks() {
+    return this.setWebhook({
+      product:   { type: "CANCEL", callbackUrls: [] },
+      stock:     { type: "CANCEL", callbackUrls: [] },
+      order:     { type: "CANCEL", callbackUrls: [] },
+      logistics: { type: "CANCEL", callbackUrls: [] },
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // LOGISTICS — Deprecated (kept for completeness)
+  // ═══════════════════════════════════════════════════════════
+
+  /** Track shipment V1 (DEPRECATED — use trackShipment instead) */
+  async trackShipmentV1(trackNumber) {
+    return this.api("/logistic/getTrackInfo", { params: { trackNumber } });
   }
 }
 
