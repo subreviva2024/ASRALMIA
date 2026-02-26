@@ -38,10 +38,10 @@ const PERGUNTAS = [
     texto: "Quando uma emoção forte surge dentro de si, o que acontece?",
     subtexto: "Feche os olhos um momento. Sinta. O que é verdadeiro?",
     opcoes: [
-      { label: "Incendeia — age imediatamente", icon: "🔥", el: "fogo" as El },
-      { label: "Solidifica — processa em silêncio", icon: "🌿", el: "terra" as El },
-      { label: "Dispersa — precisa de partilhar", icon: "🌬", el: "ar" as El },
-      { label: "Transborda — mergulha completamente", icon: "🌊", el: "agua" as El },
+      { label: "Incendeia — age imediatamente", el: "fogo" as El },
+      { label: "Solidifica — processa em silêncio", el: "terra" as El },
+      { label: "Dispersa — precisa de partilhar", el: "ar" as El },
+      { label: "Transborda — mergulha completamente", el: "agua" as El },
     ],
   },
   {
@@ -49,10 +49,10 @@ const PERGUNTAS = [
     texto: "O que mais nutre e revitaliza a sua alma?",
     subtexto: "Não o que deveria ser. O que realmente é.",
     opcoes: [
-      { label: "Novos começos e o calor da aventura", icon: "🌄", el: "fogo" as El },
-      { label: "Estabilidade, beleza e silêncio sagrado", icon: "🌳", el: "terra" as El },
-      { label: "Conversas que expandem a mente", icon: "✨", el: "ar" as El },
-      { label: "Conexão íntima e profundidade emocional", icon: "🌙", el: "agua" as El },
+      { label: "Novos começos e o calor da aventura", el: "fogo" as El },
+      { label: "Estabilidade, beleza e silêncio sagrado", el: "terra" as El },
+      { label: "Conversas que expandem a mente", el: "ar" as El },
+      { label: "Conexão íntima e profundidade emocional", el: "agua" as El },
     ],
   },
   {
@@ -60,10 +60,10 @@ const PERGUNTAS = [
     texto: "No seu inconsciente, que paisagem aparece?",
     subtexto: "A que ressoa como um eco antigo dentro de si.",
     opcoes: [
-      { label: "Vulcão em erupção ao pôr do sol", icon: "🌋", el: "fogo" as El },
-      { label: "Floresta densa e densa ao amanhecer", icon: "🌲", el: "terra" as El },
-      { label: "Vento nas cimas de uma montanha infinita", icon: "🏔", el: "ar" as El },
-      { label: "Oceano profundo à meia-noite estrelada", icon: "🌌", el: "agua" as El },
+      { label: "Vulcão em erupção ao pôr do sol", el: "fogo" as El },
+      { label: "Floresta densa e densa ao amanhecer", el: "terra" as El },
+      { label: "Vento nas cimas de uma montanha infinita", el: "ar" as El },
+      { label: "Oceano profundo à meia-noite estrelada", el: "agua" as El },
     ],
   },
   {
@@ -71,9 +71,9 @@ const PERGUNTAS = [
     texto: "Como começam os ciclos da sua vida?",
     subtexto: "Olhe para o padrão que se repete.",
     opcoes: [
-      { label: "Com arranques súbitos — decido e mergulho", icon: "⚡", mod: "cardinal" as Mod },
-      { label: "Com resistência — prefiro o que já funciona", icon: "⚓", mod: "fixo" as Mod },
-      { label: "Fluo com o que aparece — adapto-me", icon: "🌿", mod: "mutavel" as Mod },
+      { label: "Com arranques súbitos — decido e mergulho", mod: "cardinal" as Mod },
+      { label: "Com resistência — prefiro o que já funciona", mod: "fixo" as Mod },
+      { label: "Fluo com o que aparece — adapto-me", mod: "mutavel" as Mod },
     ],
   },
   {
@@ -81,9 +81,9 @@ const PERGUNTAS = [
     texto: "Qual é a sua relação com a mudança?",
     subtexto: "A resposta honesta, não a admirável.",
     opcoes: [
-      { label: "Provoco-a — sou eu que inicio", icon: "🌱", mod: "cardinal" as Mod },
-      { label: "Resisto até ao último momento possível", icon: "🔒", mod: "fixo" as Mod },
-      { label: "Aceito-a — a mudança e eu somos velhos amigos", icon: "🍃", mod: "mutavel" as Mod },
+      { label: "Provoco-a — sou eu que inicio", mod: "cardinal" as Mod },
+      { label: "Resisto até ao último momento possível", mod: "fixo" as Mod },
+      { label: "Aceito-a — a mudança e eu somos velhos amigos", mod: "mutavel" as Mod },
     ],
   },
 ];
@@ -258,7 +258,6 @@ export default function QuizLunarPage() {
                       }}>
                       {/* Luz 3D no hover */}
                       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "50%", background: "linear-gradient(to bottom,rgba(255,255,255,0.03),transparent)", pointerEvents: "none" }} />
-                      <span style={{ fontSize: "22px", flexShrink: 0 }}>{opt.icon}</span>
                       <span style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: "clamp(16px,2.2vw,20px)", fontWeight: 300, color: chosen === i ? "#f0ebe2" : "rgba(240,235,226,0.75)", lineHeight: 1.3 }}>
                         {opt.label}
                       </span>

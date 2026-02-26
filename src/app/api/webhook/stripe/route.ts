@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     }
   } else {
     // No webhook secret configured — parse directly (development mode)
-    console.warn("[Webhook] ⚠️ No STRIPE_WEBHOOK_SECRET — running without signature verification");
+    console.warn("[Webhook] WARNING: No STRIPE_WEBHOOK_SECRET — running without signature verification");
     try {
       event = JSON.parse(body) as Stripe.Event;
     } catch {
@@ -148,7 +148,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
     }
     console.log(`[Webhook] Loaded pending order ${orderId}: ${items.length} items`);
   } else {
-    console.error(`[Webhook] ⚠️ No pending order file found for ${orderId} — payment received but order data missing`);
+    console.error(`[Webhook] WARNING: No pending order file found for ${orderId} — payment received but order data missing`);
   }
 
   const serverTotal = items.reduce(
@@ -185,7 +185,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   markOrderCompleted(orderId);
 
   // Console log
-  console.log("=== 💰 PAGAMENTO RECEBIDO ===");
+  console.log("=== PAGAMENTO RECEBIDO ===");
   console.log(`Ref: ${orderId}`);
   console.log(`Stripe: ${session.id}`);
   console.log(`Valor pago: €${order.amountPaid.toFixed(2)}`);
@@ -240,16 +240,16 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
 
       if (engineRes.ok && engineData.order) {
         console.log(
-          `✅ [ENGINE] CJ order created from Stripe payment: ${engineData.order.cjOrderId || engineData.order.localId}`
+          `[ENGINE] CJ order created from Stripe payment: ${engineData.order.cjOrderId || engineData.order.localId}`
         );
       } else {
         console.error(
-          `⚠️ [ENGINE] Order forward failed: ${engineData.error || "Unknown error"}`
+          `[ENGINE] WARNING: Order forward failed: ${engineData.error || "Unknown error"}`
         );
       }
     } catch (err) {
       console.error(
-        `⚠️ [ENGINE] Connection error: ${err instanceof Error ? err.message : "Engine unreachable"}`
+          `[ENGINE] WARNING: Connection error: ${err instanceof Error ? err.message : "Engine unreachable"}`
       );
     }
   } else {

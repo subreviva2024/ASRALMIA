@@ -307,9 +307,9 @@ export default function AdminPage() {
                 { label: "⟳ Sync Encomendas", action: "sync-orders", color: C.blue },
                 { label: "⟳ Sync CJ", action: "sync-cj-orders", color: C.blue },
                 { label: "▶ Processar Encomendas", action: "process-orders", color: C.green },
-                { label: "🔍 Scan Catálogo", action: "scan-catalog", color: C.gold },
-                { label: "📦 Verificar Inventário", action: "check-inventory", color: C.orange },
-                { label: "🔔 Ativar Webhooks", action: "enable-webhooks", color: C.purple },
+                { label: "Scan Catálogo", action: "scan-catalog", color: C.gold },
+                { label: "Verificar Inventário", action: "check-inventory", color: C.orange },
+                { label: "Ativar Webhooks", action: "enable-webhooks", color: C.purple },
               ].map(({ label, action, color }) => (
                 <button key={action} onClick={() => engineAction(action)} disabled={actionLoading === action}
                   style={{ padding: "10px 20px", cursor: "pointer", background: `${color}15`, border: `1px solid ${color}30`,
@@ -392,7 +392,7 @@ export default function AdminPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {/* Filters */}
             <div style={{ display: "flex", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
-              {[{ key: "all", label: "Todas" }, { key: "paid", label: "💳 Pagas" }, { key: "pending", label: "⏳ Pendentes" }, { key: "approved", label: "✓ Aprovadas" }, { key: "rejected", label: "✗ Rejeitadas" }].map(({ key, label }) => (
+              {[{ key: "all", label: "Todas" }, { key: "paid", label: "Pagas" }, { key: "pending", label: "Pendentes" }, { key: "approved", label: "✓ Aprovadas" }, { key: "rejected", label: "✗ Rejeitadas" }].map(({ key, label }) => (
                 <button key={key} onClick={() => setOrderFilter(key)} style={{
                   padding: "8px 16px", cursor: "pointer",
                   background: orderFilter === key ? C.goldBg : "transparent",
@@ -572,7 +572,7 @@ export default function AdminPage() {
               <button onClick={() => engineAction("scan-catalog")} disabled={actionLoading === "scan-catalog"}
                 style={{ padding: "12px 24px", cursor: "pointer", background: `${C.gold}15`, border: `1px solid ${C.goldDim}`, color: C.gold,
                   fontFamily: "Inter, sans-serif", fontSize: "10px", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-                {actionLoading === "scan-catalog" ? "A scanear..." : "🔍 Scan Completo do Catálogo"}
+                {actionLoading === "scan-catalog" ? "A scanear..." : "Scan Completo do Catálogo"}
               </button>
             </div>
 
@@ -634,8 +634,8 @@ export default function AdminPage() {
               {[
                 { label: "⟳ Sync Encomendas CJ", action: "sync-cj-orders", color: C.blue },
                 { label: "▶ Processar Pipeline", action: "process-orders", color: C.green },
-                { label: "🔔 Ativar Webhooks", action: "enable-webhooks", color: C.purple },
-                { label: "🔕 Desativar Webhooks", action: "disable-webhooks", color: C.red },
+                { label: "Ativar Webhooks", action: "enable-webhooks", color: C.purple },
+                { label: "Desativar Webhooks", action: "disable-webhooks", color: C.red },
                 { label: "⚙ Configurações CJ", action: "get-cj-settings", color: C.gold },
               ].map(({ label, action, color }) => (
                 <button key={action} onClick={() => engineAction(action)} disabled={actionLoading === action}
@@ -677,8 +677,8 @@ export default function AdminPage() {
                   {[
                     { label: "▶ Processar Ciclo Completo", action: "process-orders", color: C.green },
                     { label: "⟳ Sync Encomendas", action: "sync-orders", color: C.blue },
-                    { label: "🔍 Scan Catálogo", action: "scan-catalog", color: C.gold },
-                    { label: "📦 Check Inventário", action: "check-inventory", color: C.orange },
+                    { label: "Scan Catálogo", action: "scan-catalog", color: C.gold },
+                    { label: "Check Inventário", action: "check-inventory", color: C.orange },
                     { label: "⚖ Processar Disputas", action: "process-disputes", color: C.red },
                   ].map(({ label, action, color }) => (
                     <button key={action} onClick={() => engineAction(action)} disabled={actionLoading === action}

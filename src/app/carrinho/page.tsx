@@ -326,7 +326,7 @@ export default function CarrinhoPage() {
                       fontFamily: "'Inter'", fontSize: "9px", color: "rgba(240,235,226,0.3)",
                       textAlign: "center", marginTop: "8px", letterSpacing: "0.05em",
                     }}>
-                      🔒 Pagamento seguro via Stripe · Visa, Mastercard, Apple Pay
+                      Pagamento seguro via Stripe · Visa, Mastercard, Apple Pay
                     </p>
                     <button
                       type="button"
