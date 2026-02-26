@@ -2,6 +2,7 @@ module.exports = {
   apps: [
     {
       name: "astralmia-engine",
+      namespace: "astralmia",
       script: "engine/main.js",
       cwd: __dirname,
       node_args: "--experimental-vm-modules",
@@ -23,6 +24,7 @@ module.exports = {
     },
     {
       name: "openclaw-gateway",
+      namespace: "astralmia",
       script: "openclaw",
       args: "gateway --port 18789",
       cwd: "/home/ubuntu",
@@ -42,6 +44,7 @@ module.exports = {
     },
     {
       name: "caela-engine",
+      namespace: "astralmia",
       script: "../bot/server.js",
       cwd: __dirname,
       instances: 1,
