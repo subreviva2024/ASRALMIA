@@ -69,10 +69,19 @@ export default function CarrinhoPage() {
         >
           <div style={{ fontSize: "48px", marginBottom: "32px" }}>✦</div>
           <h1 style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: "clamp(32px,5vw,48px)", fontWeight: 300, color: "#f0ebe2", marginBottom: "20px", lineHeight: 1.2 }}>
-            Encomenda Recebida
+            Encomenda Confirmada
           </h1>
-          <p style={{ fontFamily: "'Inter'", fontSize: "14px", fontWeight: 300, color: "rgba(240,235,226,0.55)", lineHeight: 1.9, marginBottom: "40px" }}>
-            A sua encomenda foi registada com sucesso. Entraremos em contacto em até 2 horas para confirmar os detalhes e o pagamento.
+          {orderRef && (
+            <p style={{ fontFamily: "'Inter'", fontSize: "13px", fontWeight: 500, color: "#c9a84c", letterSpacing: "0.1em", marginBottom: "20px" }}>
+              Ref: {orderRef}
+            </p>
+          )}
+          <p style={{ fontFamily: "'Inter'", fontSize: "14px", fontWeight: 300, color: "rgba(240,235,226,0.55)", lineHeight: 1.9, marginBottom: "16px" }}>
+            A sua encomenda foi processada com sucesso e está a ser preparada para envio.
+            Receberá actualizações de rastreamento por email.
+          </p>
+          <p style={{ fontFamily: "'Inter'", fontSize: "12px", fontWeight: 300, color: "rgba(240,235,226,0.35)", lineHeight: 1.8, marginBottom: "40px" }}>
+            Prazo estimado de entrega: 7-15 dias úteis para Portugal.
           </p>
           <Link
             href="/loja"
@@ -287,6 +296,14 @@ export default function CarrinhoPage() {
                         onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
                       />
                     </div>
+                    {error && (
+                      <div style={{
+                        padding: "12px 16px", background: "rgba(220,50,50,0.1)", border: "1px solid rgba(220,50,50,0.3)",
+                        fontFamily: "'Inter'", fontSize: "12px", color: "#e05555", lineHeight: 1.5,
+                      }}>
+                        {error}
+                      </div>
+                    )}
                     <button
                       type="submit"
                       disabled={submitting}

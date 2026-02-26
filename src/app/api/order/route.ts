@@ -2,12 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import * as fs from "fs";
 import * as path from "path";
 
+const ENGINE_URL = process.env.ASTRALMIA_ENGINE_URL || "http://localhost:4002";
+
 interface OrderItem {
   pid: string;
   vid: string;
   name: string;
   image: string;
   priceEur: number;
+  costEur?: number;
   qty: number;
   shippingLabel: string;
 }
@@ -53,7 +56,9 @@ function persistOrder(order: Record<string, unknown>) {
 /**
  * POST /api/order
  * Receives an order from the cart checkout.
- * Validates all fields, persists to JSON file, logs for processing.
+ * 1. Validates all fields
+ * 2. Persists to JSON file (backup)
+ * 3. Forwards to ASTRALMIA Engine → auto-creates CJ order → auto-pays → ships direct
  */
 export async function POST(req: NextRequest) {
   try {
@@ -132,11 +137,74 @@ export async function POST(req: NextRequest) {
     console.log(`Total: €${serverTotal.toFixed(2)}`);
     console.log("====================");
 
+    // ══════════════════════════════════════════════════════════
+    // FORWARD TO ENGINE → CJ Order Pipeline
+    // Engine creates CJ order → auto-confirms → auto-pays with balance → ships direct
+    // ══════════════════════════════════════════════════════════
+
+    let engineOrder = null;
+    let engineError = null;
+
+    try {
+      const enginePayload = {
+        customer: {
+          name: customer.name.trim(),
+          email: customer.email.trim().toLowerCase(),
+          phone: customer.phone?.trim() || "",
+          address: {
+            address: customer.address.trim(),
+            line1: customer.address.trim(),
+            city: customer.city.trim(),
+            zip: customer.zip.trim(),
+            postalCode: customer.zip.trim(),
+            province: customer.city.trim(),
+            state: customer.city.trim(),
+            country: "PT",
+          },
+        },
+        items: items.map((item) => ({
+          pid: item.pid,
+          vid: item.vid,
+          quantity: item.qty,
+          retailPrice: item.priceEur,
+        })),
+        shippingCountry: "PT",
+        retailPrice: serverTotal,
+      };
+
+      const engineRes = await fetch(`${ENGINE_URL}/orders/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(enginePayload),
+        signal: AbortSignal.timeout(15000), // 15s timeout
+      });
+
+      const engineData = await engineRes.json();
+
+      if (engineRes.ok && engineData.order) {
+        engineOrder = engineData.order;
+        console.log(`✅ [ENGINE] CJ order created: ${engineOrder.cjOrderId || engineOrder.localId}`);
+        console.log(`   Status: ${engineOrder.status}`);
+        if (engineOrder.cjCost) console.log(`   CJ Cost: $${engineOrder.cjCost}`);
+      } else {
+        engineError = engineData.error || "Engine returned no order";
+        console.error(`⚠️ [ENGINE] Order forward failed: ${engineError}`);
+      }
+    } catch (err) {
+      engineError = err instanceof Error ? err.message : "Engine unreachable";
+      console.error(`⚠️ [ENGINE] Connection error: ${engineError}`);
+    }
+
     return NextResponse.json({
       success: true,
       orderRef,
       total: serverTotal,
-      message: "Encomenda registada com sucesso. Entraremos em contacto em breve.",
+      cjOrderId: engineOrder?.cjOrderId || null,
+      cjStatus: engineOrder?.status || "pending",
+      message: engineOrder?.cjOrderId
+        ? "Encomenda criada com sucesso! O seu pedido está a ser processado e será enviado automaticamente."
+        : "Encomenda registada com sucesso. Entraremos em contacto em breve para confirmar.",
+      engineError: engineError || undefined,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erro interno";
