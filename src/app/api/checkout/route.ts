@@ -1,15 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import * as fs from "fs";
+import * as path from "path";
+import * as crypto from "crypto";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-02-25.clover",
 });
+
+/** Save pending order data to file (avoids Stripe 500-char metadata limit) */
+function savePendingOrder(orderId: string, data: Record<string, unknown>) {
+  try {
+    const dir = path.join(process.cwd(), "data", "pending");
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, `${orderId}.json`), JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.error("[Checkout] Failed to save pending order:", err);
+  }
+}
 
 /**
  * POST /api/checkout
  * Creates a Stripe Checkout Session.
  * Client sends cart items + shipping info → we create a checkout session → return URL.
  * After payment, Stripe calls our webhook → we create CJ order.
+ *
+ * Full order data is stored server-side (data/pending/<orderId>.json) to avoid
+ * Stripe's 500-char metadata limit, which would truncate multi-item orders.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -35,6 +52,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Código postal é obrigatório" }, { status: 400 });
     }
 
+    // Generate unique order ID
+    const orderId = `AST-${Date.now().toString(36).toUpperCase()}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+
     // Build Stripe line items from cart
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map(
       (item: { name: string; priceEur: number; qty: number; image?: string }) => ({
@@ -50,59 +70,56 @@ export async function POST(req: NextRequest) {
       })
     );
 
+    // Save full order data server-side (no 500-char limit)
+    const fullItems = items.map((item: { pid: string; vid: string; name: string; image: string; priceEur: number; costEur?: number; qty: number; shippingLabel: string }) => ({
+      pid: item.pid,
+      vid: item.vid,
+      name: item.name,
+      image: item.image,
+      priceEur: item.priceEur,
+      costEur: item.costEur || 0,
+      qty: item.qty,
+      shippingLabel: item.shippingLabel,
+    }));
+
+    const customerData = {
+      name: customer.name.trim(),
+      email: customer.email.trim().toLowerCase(),
+      phone: customer.phone?.trim() || "",
+      address: customer.address.trim(),
+      city: customer.city.trim(),
+      zip: customer.zip.trim(),
+      country: "PT",
+      notes: (customer.notes?.trim() || "").slice(0, 500),
+    };
+
+    savePendingOrder(orderId, {
+      orderId,
+      customer: customerData,
+      items: fullItems,
+      total: Math.round(items.reduce((s: number, i: { priceEur: number; qty: number }) => s + i.priceEur * i.qty, 0) * 100) / 100,
+      createdAt: new Date().toISOString(),
+    });
+
     // Build origin URL for redirects
     const origin = req.headers.get("origin") || req.headers.get("referer")?.replace(/\/[^/]*$/, "") || "http://localhost:3000";
 
-    // Create Stripe Checkout Session
+    // Create Stripe Checkout Session — only store orderId in metadata (no truncation risk)
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
       line_items: lineItems,
-      customer_email: customer.email.trim().toLowerCase(),
-      // Store order metadata so webhook can access it
+      customer_email: customerData.email,
       metadata: {
-        customer_name: customer.name.trim(),
-        customer_email: customer.email.trim().toLowerCase(),
-        customer_phone: customer.phone?.trim() || "",
-        customer_address: customer.address.trim(),
-        customer_city: customer.city.trim(),
-        customer_zip: customer.zip.trim(),
-        customer_notes: (customer.notes?.trim() || "").slice(0, 500),
-        items_json: JSON.stringify(
-          items.map((item: { pid: string; vid: string; name: string; image: string; priceEur: number; costEur?: number; qty: number; shippingLabel: string }) => ({
-            pid: item.pid,
-            vid: item.vid,
-            name: item.name,
-            image: item.image,
-            priceEur: item.priceEur,
-            costEur: item.costEur || 0,
-            qty: item.qty,
-            shippingLabel: item.shippingLabel,
-          }))
-        ).slice(0, 500), // Stripe metadata max 500 chars per value
+        order_id: orderId,
+        customer_name: customerData.name,
+        customer_email: customerData.email,
       },
-      // Store full items in payment_intent metadata too (for larger orders)
       payment_intent_data: {
         metadata: {
-          customer_name: customer.name.trim(),
-          customer_email: customer.email.trim().toLowerCase(),
-          customer_phone: customer.phone?.trim() || "",
-          customer_address: customer.address.trim(),
-          customer_city: customer.city.trim(),
-          customer_zip: customer.zip.trim(),
-          customer_notes: (customer.notes?.trim() || "").slice(0, 500),
-          items_json: JSON.stringify(
-            items.map((item: { pid: string; vid: string; name: string; image: string; priceEur: number; costEur?: number; qty: number; shippingLabel: string }) => ({
-              pid: item.pid,
-              vid: item.vid,
-              name: item.name,
-              image: item.image,
-              priceEur: item.priceEur,
-              costEur: item.costEur || 0,
-              qty: item.qty,
-              shippingLabel: item.shippingLabel,
-            }))
-          ).slice(0, 500),
+          order_id: orderId,
+          customer_name: customerData.name,
+          customer_email: customerData.email,
         },
       },
       success_url: `${origin}/checkout/sucesso?session_id={CHECKOUT_SESSION_ID}`,
@@ -110,7 +127,9 @@ export async function POST(req: NextRequest) {
       locale: "pt",
     });
 
-    return NextResponse.json({ url: session.url });
+    console.log(`[Checkout] Session ${session.id} created for order ${orderId} — €${(session.amount_total || 0) / 100}`);
+
+    return NextResponse.json({ url: session.url, orderId });
   } catch (err) {
     console.error("[Checkout] Stripe error:", err);
     const message = err instanceof Error ? err.message : "Erro ao criar sessão de pagamento";
