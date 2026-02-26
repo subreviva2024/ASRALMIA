@@ -59,7 +59,7 @@ const SEARCH_QUERIES = [
 // Catalog Manager
 // ═══════════════════════════════════════════════════════════
 
-class CatalogManager {
+export class CatalogManager {
   constructor() {
     this.catalog = { products: [], updatedAt: null, stats: {} };
     this.history = [];

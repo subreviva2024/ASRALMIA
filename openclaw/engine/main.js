@@ -19,6 +19,37 @@ import CJClient from "./cj-client.js";
 import { analyzeProduct, translateProduct, calculatePricing } from "./product-engine.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// ── Load .env (no dependencies) ──
+function loadEnv() {
+  const envPaths = [
+    join(__dirname, "..", ".env"),
+    join(__dirname, "..", "openclaw", ".env"),
+    join(__dirname, "..", "..", "openclaw", ".env"),
+  ];
+  for (const p of envPaths) {
+    if (existsSync(p)) {
+      const lines = readFileSync(p, "utf-8").split("\n");
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#")) continue;
+        const eq = trimmed.indexOf("=");
+        if (eq < 1) continue;
+        const key = trimmed.slice(0, eq).trim();
+        let val = trimmed.slice(eq + 1).trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        if (!process.env[key]) process.env[key] = val;
+      }
+      console.log(`[ASTRALMIA] .env loaded from ${p}`);
+      return;
+    }
+  }
+  console.log("[ASTRALMIA] No .env file found — using environment variables");
+}
+loadEnv();
+
 const DATA_DIR = join(__dirname, "..", "data");
 const PORT = parseInt(process.env.ASTRALMIA_PORT || "4002", 10);
 
