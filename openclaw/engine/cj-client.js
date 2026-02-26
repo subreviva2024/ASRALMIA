@@ -1,14 +1,32 @@
 /**
- * ASTRALMIA — CJ Dropshipping API Client (Production)
+ * ASTRALMIA — CJ Dropshipping API Client v4.0 (Full Coverage)
  * 
- * Standalone CJ API client with:
+ * COMPLETE CJ API v2.0 integration — ALL endpoints:
+ * 
+ * ┌─────────────────────────────────────────────────────────┐
+ * │  AUTH       │ getAccessToken, refreshAccessToken, logout│
+ * │  PRODUCT    │ list, listV2, query, variant, stock (3),  │
+ * │             │ categories, warehouses, reviews,          │
+ * │             │ addToMyProduct, myProduct/query            │
+ * │  SOURCING   │ create, query                             │
+ * │  STORAGE    │ warehouse detail                          │
+ * │  SHOPPING   │ createOrderV2/V3, addCart, confirmCart,   │
+ * │             │ saveParentOrder, list, delete, confirm,   │
+ * │             │ changeWarehouse, waybill upload/update,   │
+ * │             │ POD pictures                              │
+ * │  PAYMENT    │ getBalance, payBalance, payBalanceV2      │
+ * │  LOGISTICS  │ freightCalculate, freightCalculateTip,    │
+ * │             │ supplierLogistics, trackInfo (v2)         │
+ * │  DISPUTES   │ products, confirm, create, cancel, list   │
+ * │  SETTINGS   │ get                                       │
+ * └─────────────────────────────────────────────────────────┘
+ * 
+ * Features:
  * - Token lifecycle (15d access / 180d refresh)
  * - Auto-retry with exponential backoff
  * - Rate limiting (350ms between requests)
- * - All CJ API v2.0 endpoints
  * - Error classification (auth/rate/network/api)
- * 
- * Uses ONLY real CJ API data. Zero mocks.
+ * - Zero mocks — real CJ API data only
  */
 
 const CJ_BASE = "https://developers.cjdropshipping.com/api2.0/v1";
@@ -51,7 +69,6 @@ export class CJClient {
     if (this.#token && Date.now() < this.#tokenExpiry - 3_600_000) {
       return this.#token;
     }
-    // Try refresh first
     if (this.#refreshToken && Date.now() < this.#refreshExpiry - 3_600_000) {
       try { return await this.#doRefresh(); } catch { this.#token = null; }
     }
@@ -149,13 +166,45 @@ export class CJClient {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // HIGH-LEVEL API METHODS
+  // AUTHENTICATION
   // ═══════════════════════════════════════════════════════════
 
-  /** Search products by keyword */
+  /** Invalidate current access token */
+  async logout() {
+    return this.api("/authentication/logout", { method: "POST" });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // PRODUCT — Search & Query
+  // ═══════════════════════════════════════════════════════════
+
+  /** Search products by keyword (basic) */
   async searchProducts(query, page = 1, pageSize = 20) {
     return this.api("/product/list", {
       params: { productNameEn: query, pageNum: String(page), pageSize: String(Math.min(pageSize, 200)) },
+    });
+  }
+
+  /** Search products V2 — Elasticsearch-powered, better results */
+  async searchProductsV2(params = {}) {
+    const {
+      keyword = "", categoryId, pageNum = 1, pageSize = 20,
+      sortField, sortType, priceMin, priceMax,
+      createTimeFrom, createTimeTo,
+    } = params;
+    return this.api("/product/listV2", {
+      params: {
+        productNameEn: keyword || undefined,
+        categoryId: categoryId || undefined,
+        pageNum: String(pageNum),
+        pageSize: String(Math.min(pageSize, 200)),
+        sortField: sortField || undefined,
+        sortType: sortType || undefined,
+        priceMin: priceMin != null ? String(priceMin) : undefined,
+        priceMax: priceMax != null ? String(priceMax) : undefined,
+        createTimeFrom: createTimeFrom || undefined,
+        createTimeTo: createTimeTo || undefined,
+      },
     });
   }
 
@@ -164,18 +213,113 @@ export class CJClient {
     return this.api("/product/query", { params: { pid } });
   }
 
-  /** Get all variants for a product */
+  /** Get all variants for a product by PID */
   async getVariants(pid) {
     const data = await this.api("/product/variant/query", { params: { pid } });
     return Array.isArray(data) ? data : data?.list || [];
   }
 
-  /** Check real-time inventory */
+  /** Get variant details by VID */
+  async getVariantById(vid) {
+    return this.api("/product/variant/queryByVid", { params: { vid } });
+  }
+
+  /** List product categories */
+  async getCategories() {
+    return this.api("/product/getCategory");
+  }
+
+  /** Add a product to My Products */
+  async addToMyProduct(pid) {
+    return this.api("/product/addToMyProduct", {
+      method: "POST",
+      body: { pid },
+    });
+  }
+
+  /** Query My Products list */
+  async getMyProducts(params = {}) {
+    const { keyword, pageNum = 1, pageSize = 20 } = params;
+    return this.api("/product/myProduct/query", {
+      params: {
+        productNameEn: keyword || undefined,
+        pageNum: String(pageNum),
+        pageSize: String(Math.min(pageSize, 200)),
+      },
+    });
+  }
+
+  /** Get product reviews/comments */
+  async getProductReviews(pid, pageNum = 1, pageSize = 50) {
+    return this.api("/product/productComments", {
+      params: { pid, pageNum: String(pageNum), pageSize: String(pageSize) },
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // PRODUCT — Inventory / Stock
+  // ═══════════════════════════════════════════════════════════
+
+  /** Check real-time inventory by PID */
   async checkInventory(pid) {
     return this.api("/product/stock/queryByPid", { params: { pid } });
   }
 
-  /** Calculate freight/shipping */
+  /** Check inventory by Variant ID */
+  async checkInventoryByVid(vid) {
+    return this.api("/product/stock/queryByVid", { params: { vid } });
+  }
+
+  /** Check inventory by SKU */
+  async checkInventoryBySku(sku) {
+    return this.api("/product/stock/queryBySku", { params: { sku } });
+  }
+
+  /** Get detailed inventory by PID */
+  async getInventoryByPid(pid) {
+    return this.api("/product/stock/getInventoryByPid", { params: { pid } });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // PRODUCT — Warehouses
+  // ═══════════════════════════════════════════════════════════
+
+  /** List all global CJ warehouses */
+  async getWarehouses() {
+    return this.api("/product/globalWarehouseList");
+  }
+
+  /** Get detailed info about a specific warehouse */
+  async getWarehouseDetail(warehouseId) {
+    return this.api("/warehouse/detail", { params: { warehouseId } });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // SOURCING
+  // ═══════════════════════════════════════════════════════════
+
+  /** Create a sourcing request */
+  async createSourcing(data) {
+    return this.api("/product/sourcing/create", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  /** Query sourcing requests */
+  async querySourcing(params = {}) {
+    const { pageNum = 1, pageSize = 20 } = params;
+    return this.api("/product/sourcing/query", {
+      method: "POST",
+      body: { pageNum, pageSize, ...params },
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // LOGISTICS — Freight & Tracking
+  // ═══════════════════════════════════════════════════════════
+
+  /** Calculate freight/shipping (basic) */
   async calculateShipping(vid, countryCode = "PT", quantity = 1) {
     const data = await this.api("/logistic/freightCalculate", {
       method: "POST",
@@ -190,17 +334,68 @@ export class CJClient {
         method: s.logisticName,
         priceUsd: parseFloat(s.logisticPrice) || 0,
         days: s.logisticAging || "7-15",
+        logisticId: s.logisticId || "",
       }))
       .sort((a, b) => a.priceUsd - b.priceUsd);
     return options;
   }
 
-  /** List product categories */
-  async getCategories() {
-    return this.api("/product/getCategory");
+  /** Calculate freight with tips — more accurate pricing */
+  async calculateShippingTip(params) {
+    const {
+      startCountryCode = "CN", endCountryCode = "PT",
+      products = [], warehouseId,
+    } = params;
+    return this.api("/logistic/freightCalculateTip", {
+      method: "POST",
+      body: {
+        startCountryCode,
+        endCountryCode,
+        products,
+        warehouseId: warehouseId || undefined,
+      },
+    });
   }
 
-  /** Create order via v2 API */
+  /** Get supplier logistics templates */
+  async getSupplierLogistics(params) {
+    const { startCountryCode = "CN", endCountryCode = "PT", products = [] } = params;
+    return this.api("/logistic/getSupplierLogisticsTemplate", {
+      method: "POST",
+      body: { startCountryCode, endCountryCode, products },
+    });
+  }
+
+  /** Track shipment V2 (current endpoint) */
+  async trackShipment(trackNumber) {
+    return this.api("/logistic/trackInfo", { params: { trackNumber } });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // SHOPPING — Cart
+  // ═══════════════════════════════════════════════════════════
+
+  /** Add products to cart */
+  async addToCart(cartItems) {
+    return this.api("/shopping/order/addCart", {
+      method: "POST",
+      body: Array.isArray(cartItems) ? cartItems : [cartItems],
+    });
+  }
+
+  /** Confirm cart and generate order */
+  async confirmCart(data) {
+    return this.api("/shopping/order/addCartConfirm", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // SHOPPING — Orders
+  // ═══════════════════════════════════════════════════════════
+
+  /** Create order via V2 API */
   async createOrder(orderData) {
     return this.api("/shopping/order/createOrderV2", {
       method: "POST",
@@ -208,19 +403,174 @@ export class CJClient {
     });
   }
 
-  /** Get order details */
+  /** Create order via V3 API (latest) */
+  async createOrderV3(orderData) {
+    return this.api("/shopping/order/createOrderV3", {
+      method: "POST",
+      body: orderData,
+    });
+  }
+
+  /** Save/generate parent order (batch) */
+  async saveParentOrder(data) {
+    return this.api("/shopping/order/saveGenerateParentOrder", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  /** Get order details by orderId */
   async getOrder(orderId) {
     return this.api("/shopping/order/getOrderDetail", { params: { orderId } });
   }
 
-  /** Track shipment */
-  async trackShipment(trackNumber) {
-    return this.api("/logistic/getTrackInfo", { params: { trackNumber } });
+  /** List all orders with pagination and filters */
+  async listOrders(params = {}) {
+    const {
+      pageNum = 1, pageSize = 20, orderStatus,
+      createDateFrom, createDateTo, orderId,
+    } = params;
+    return this.api("/shopping/order/list", {
+      params: {
+        pageNum: String(pageNum),
+        pageSize: String(Math.min(pageSize, 200)),
+        orderStatus: orderStatus || undefined,
+        createDateFrom: createDateFrom || undefined,
+        createDateTo: createDateTo || undefined,
+        orderId: orderId || undefined,
+      },
+    });
   }
 
-  /** List warehouses */
-  async getWarehouses() {
-    return this.api("/product/globalWarehouseList");
+  /** Delete an order */
+  async deleteOrder(orderId) {
+    return this.api("/shopping/order/deleteOrder", {
+      method: "DELETE",
+      params: { orderId },
+    });
+  }
+
+  /** Confirm an order (ready for processing) */
+  async confirmOrder(orderId) {
+    return this.api("/shopping/order/confirmOrder", {
+      method: "PATCH",
+      body: { orderId },
+    });
+  }
+
+  /** Change order warehouse */
+  async changeOrderWarehouse(data) {
+    return this.api("/shopping/order/changeWarehouse", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // SHOPPING — Shipping Info (Waybill)
+  // ═══════════════════════════════════════════════════════════
+
+  /** Upload waybill/shipping info */
+  async uploadShippingInfo(data) {
+    return this.api("/shopping/order/uploadWaybillInfo", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  /** Update waybill/shipping info */
+  async updateShippingInfo(data) {
+    return this.api("/shopping/order/updateWaybillInfo", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  /** Update POD (Print-on-Demand) product custom pictures */
+  async updatePodPictures(data) {
+    return this.api("/shopping/order/podProductCustomPicturesEdit", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // PAYMENT
+  // ═══════════════════════════════════════════════════════════
+
+  /** Get CJ account balance */
+  async getBalance() {
+    return this.api("/shopping/pay/getBalance");
+  }
+
+  /** Pay for order using CJ balance */
+  async payBalance(orderId) {
+    return this.api("/shopping/pay/payBalance", {
+      method: "POST",
+      body: { orderId },
+    });
+  }
+
+  /** Pay for order V2 (supports multiple payment options) */
+  async payBalanceV2(data) {
+    return this.api("/shopping/pay/payBalanceV2", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // DISPUTES
+  // ═══════════════════════════════════════════════════════════
+
+  /** Get dispute-eligible products for an order */
+  async getDisputeProducts(orderId) {
+    return this.api("/disputes/disputeProducts", { params: { orderId } });
+  }
+
+  /** Confirm dispute info before creating */
+  async confirmDisputeInfo(data) {
+    return this.api("/disputes/disputeConfirmInfo", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  /** Create a dispute */
+  async createDispute(data) {
+    return this.api("/disputes/create", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  /** Cancel a dispute */
+  async cancelDispute(data) {
+    return this.api("/disputes/cancel", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  /** List disputes with filters */
+  async listDisputes(params = {}) {
+    const { pageNum = 1, pageSize = 20, disputeStatus } = params;
+    return this.api("/disputes/getDisputeList", {
+      params: {
+        pageNum: String(pageNum),
+        pageSize: String(Math.min(pageSize, 200)),
+        disputeStatus: disputeStatus || undefined,
+      },
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // SETTINGS
+  // ═══════════════════════════════════════════════════════════
+
+  /** Get CJ account settings */
+  async getSettings() {
+    return this.api("/setting/get");
   }
 }
 

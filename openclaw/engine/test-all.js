@@ -1,5 +1,5 @@
 /**
- * ASTRALMIA — Test Suite
+ * ASTRALMIA — Test Suite v4.0
  * Tests all engine modules for correctness
  */
 
@@ -10,7 +10,16 @@ let failed = 0;
 
 function test(name, fn) {
   try {
-    fn();
+    const result = fn();
+    if (result && typeof result.then === "function") {
+      return result.then(() => {
+        console.log(`  ✅ ${name}`);
+        passed++;
+      }).catch(err => {
+        console.log(`  ❌ ${name}: ${err.message}`);
+        failed++;
+      });
+    }
     console.log(`  ✅ ${name}`);
     passed++;
   } catch (err) {
@@ -24,7 +33,7 @@ function assert(condition, msg = "Assertion failed") {
 }
 
 console.log("\n═══════════════════════════════════════════════════════");
-console.log("  ✨ ASTRALMIA — Engine Tests v3.0");
+console.log("  ✨ ASTRALMIA — Engine Tests v4.0");
 console.log("═══════════════════════════════════════════════════════\n");
 
 // ── Translation Engine ──────────────────────────────────────
@@ -168,22 +177,149 @@ test("noise words removed", () => {
 
 console.log("\n📦 Module Imports:");
 
-test("CJClient imports", async () => {
+await test("CJClient imports", async () => {
   const m = await import("./cj-client.js");
   assert(m.CJClient !== undefined);
+  assert(typeof m.CJClient === "function");
 });
 
-test("catalog-scanner imports", async () => {
+await test("catalog-scanner imports", async () => {
   const m = await import("./catalog-scanner.js");
   assert(typeof m.runFullScan === "function");
+  assert(typeof m.CatalogManager === "function");
 });
 
-test("product-engine imports", async () => {
+await test("product-engine imports", async () => {
   const m = await import("./product-engine.js");
   assert(typeof m.analyzeProduct === "function");
+  assert(typeof m.translateProduct === "function");
+  assert(typeof m.calculatePricing === "function");
+});
+
+await test("order-manager imports", async () => {
+  const m = await import("./order-manager.js");
+  assert(typeof m.OrderManager === "function");
+  assert(typeof m.startOrderDaemon === "function");
+  assert(m.STATUS !== undefined);
+});
+
+await test("inventory-monitor imports", async () => {
+  const m = await import("./inventory-monitor.js");
+  assert(typeof m.InventoryMonitor === "function");
+  assert(typeof m.startInventoryDaemon === "function");
+});
+
+await test("dispute-manager imports", async () => {
+  const m = await import("./dispute-manager.js");
+  assert(typeof m.DisputeManager === "function");
+  assert(typeof m.startDisputeDaemon === "function");
+});
+
+// ── CJ Client Structure ──────────────────────────────────
+
+console.log("\n🔗 CJ Client v4.0 API Coverage:");
+
+await test("CJClient has all 40+ methods", async () => {
+  const m = await import("./cj-client.js");
+  // Use prototype to check methods
+  const proto = m.CJClient.prototype;
+  const methods = [
+    // Auth
+    "logout",
+    // Product
+    "searchProducts", "searchProductsV2", "getProduct", "getVariants",
+    "getVariantById", "getCategories", "addToMyProduct", "getMyProducts",
+    "getProductReviews",
+    // Stock
+    "checkInventory", "checkInventoryByVid", "checkInventoryBySku", "getInventoryByPid",
+    // Warehouses
+    "getWarehouses", "getWarehouseDetail",
+    // Sourcing
+    "createSourcing", "querySourcing",
+    // Logistics
+    "calculateShipping", "calculateShippingTip", "getSupplierLogistics", "trackShipment",
+    // Cart
+    "addToCart", "confirmCart",
+    // Orders
+    "createOrder", "createOrderV3", "saveParentOrder", "getOrder",
+    "listOrders", "deleteOrder", "confirmOrder", "changeOrderWarehouse",
+    // Shipping Info
+    "uploadShippingInfo", "updateShippingInfo", "updatePodPictures",
+    // Payment
+    "getBalance", "payBalance", "payBalanceV2",
+    // Disputes
+    "getDisputeProducts", "confirmDisputeInfo", "createDispute", "cancelDispute", "listDisputes",
+    // Settings
+    "getSettings",
+    // Core
+    "api",
+  ];
+
+  const missing = methods.filter(m => typeof proto[m] !== "function");
+  assert(missing.length === 0, `Missing methods: ${missing.join(", ")}`);
+  assert(methods.length >= 40, `Expected 40+ methods, got ${methods.length}`);
+});
+
+// ── Order Manager Structure ──────────────────────────────
+
+console.log("\n📦 Order Manager:");
+
+await test("OrderManager has all lifecycle methods", async () => {
+  const m = await import("./order-manager.js");
+  const proto = m.OrderManager.prototype;
+  const methods = [
+    "load", "save", "getOrders", "getOrder", "getStats", "getHistory",
+    "createOrder", "autoConfirmOrders", "autoPayOrders",
+    "syncOrderStatuses", "syncTracking", "retryFailedOrders",
+    "cancelOrder", "syncFromCJ", "checkBalance", "processCycle",
+  ];
+  const missing = methods.filter(m => typeof proto[m] !== "function");
+  assert(missing.length === 0, `Missing: ${missing.join(", ")}`);
+});
+
+await test("STATUS constants correct", async () => {
+  const { STATUS } = await import("./order-manager.js");
+  assert(STATUS.PENDING === "pending");
+  assert(STATUS.SHIPPED === "shipped");
+  assert(STATUS.DELIVERED === "delivered");
+  assert(STATUS.FAILED === "failed");
+});
+
+// ── Inventory Monitor Structure ──────────────────────────
+
+console.log("\n📊 Inventory Monitor:");
+
+await test("InventoryMonitor has all methods", async () => {
+  const m = await import("./inventory-monitor.js");
+  const proto = m.InventoryMonitor.prototype;
+  const methods = [
+    "load", "save", "getStats", "getAlerts", "getInventory",
+    "checkAllStock", "checkProduct", "getWarehouseInventory",
+  ];
+  const missing = methods.filter(m => typeof proto[m] !== "function");
+  assert(missing.length === 0, `Missing: ${missing.join(", ")}`);
+});
+
+// ── Dispute Manager Structure ──────────────────────────
+
+console.log("\n⚠️ Dispute Manager:");
+
+await test("DisputeManager has all methods", async () => {
+  const m = await import("./dispute-manager.js");
+  const proto = m.DisputeManager.prototype;
+  const methods = [
+    "load", "save", "getStats", "getDisputes",
+    "detectProblems", "createDisputeForOrder", "syncDisputes",
+    "cancelDispute", "processCycle",
+  ];
+  const missing = methods.filter(m => typeof proto[m] !== "function");
+  assert(missing.length === 0, `Missing: ${missing.join(", ")}`);
 });
 
 // ── Summary ──────────────────────────────────────────────
+
+// Give async tests a moment to complete
+await new Promise(r => setTimeout(r, 100));
 
 console.log("\n═══════════════════════════════════════════════════════");
 console.log(`  Results: ${passed} passed, ${failed} failed`);
