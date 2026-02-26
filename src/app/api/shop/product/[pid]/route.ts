@@ -1,20 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
-/**
- * GET /api/cj/product/[pid]
- * 
- * Get full product details from the ASTRALMIA engine's catalog.
- * The engine stores pre-analyzed products with variants, shipping, and pricing.
- * Falls back to direct CJ API call if not in engine catalog.
- */
-
 const ENGINE_URL = process.env.ASTRALMIA_ENGINE_URL || "http://localhost:4002";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ pid: string }> }) {
   try {
     const { pid } = await params;
 
-    // First, try the engine (instant, pre-cached)
     try {
       const engineRes = await fetch(`${ENGINE_URL}/product/${pid}`, {
         next: { revalidate: 300 },
@@ -25,7 +16,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ pid:
         const data = await engineRes.json();
         if (data.product) {
           const p = data.product;
-          // Map engine product → CJ product format expected by the detail page
           const product = {
             pid: p.pid,
             productNameEn: p.nameEn || p.namePt,
@@ -45,7 +35,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ pid:
             variantImage: v.image || p.image,
             variantKey: v.name,
           }));
-          // If no variants, create one from the product
           if (variants.length === 0 && p.vid) {
             variants.push({
               vid: p.vid,
@@ -64,10 +53,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ pid:
         }
       }
     } catch {
-      // Engine unavailable, fall through to direct CJ call
+      // Engine unavailable, fall through
     }
 
-    // Fallback: direct CJ API call (slower, but ensures product is accessible)
     const { getProductDetail, getProductVariants, calculateFreight } = await import("@/lib/cj");
     const [product, variants] = await Promise.all([
       getProductDetail(pid),

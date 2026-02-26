@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calculateFreight } from "@/lib/cj";
 
-/**
- * POST /api/cj/freight
- * Calculate shipping cost to Portugal for a specific product variant.
- *
- * Body: { vid: string, quantity?: number, zip?: string }
- */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -22,7 +16,6 @@ export async function POST(req: NextRequest) {
       ...(zip ? { zip } : {}),
     });
 
-    // Sort by price ascending
     const sorted = [...options].sort((a, b) => a.logisticPrice - b.logisticPrice);
 
     return NextResponse.json({

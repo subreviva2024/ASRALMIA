@@ -1,12 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-/**
- * GET /api/cj/products — Live search via ASTRALMIA Engine
- * 
- * Uses the engine's /search endpoint for live CJ searches,
- * or falls back to catalog browsing.
- */
-
 const ENGINE_URL = process.env.ASTRALMIA_ENGINE_URL || "http://localhost:4002";
 
 export async function GET(req: NextRequest) {
@@ -16,7 +9,6 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(url.searchParams.get("size") || "20");
 
     if (keyword) {
-      // Live search through engine
       try {
         const res = await fetch(`${ENGINE_URL}/search`, {
           method: "POST",
@@ -48,14 +40,13 @@ export async function GET(req: NextRequest) {
       } catch { /* fall through */ }
     }
 
-    // Fallback: return from catalog
     const params = new URLSearchParams();
     params.set("limit", String(limit));
     params.set("sort", "score");
     const res = await fetch(`${ENGINE_URL}/catalog?${params.toString()}`);
-    
+
     if (!res.ok) throw new Error(`Engine returned ${res.status}`);
-    
+
     const data = await res.json();
     return NextResponse.json({
       keyword: keyword || "catalog",

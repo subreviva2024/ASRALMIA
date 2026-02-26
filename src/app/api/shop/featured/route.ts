@@ -1,15 +1,6 @@
 import { NextResponse } from "next/server";
 
-/**
- * GET /api/cj/featured — Proxies to ASTRALMIA Engine
- * 
- * Returns top-scoring products from the autonomous engine's catalog.
- * The engine pre-filters, translates, and scores all products.
- */
-
 const ENGINE_URL = process.env.ASTRALMIA_ENGINE_URL || "http://localhost:4002";
-
-// ── Types ───────────────────────────────────────────────────────────────────
 
 export interface FeaturedProduct {
   pid: string;
@@ -31,8 +22,6 @@ export interface FeaturedProduct {
   tag: string;
 }
 
-// ── Route handler ────────────────────────────────────────────────────────────
-
 export async function GET() {
   try {
     const engineUrl = `${ENGINE_URL}/catalog/featured?limit=12`;
@@ -48,7 +37,6 @@ export async function GET() {
     const data = await res.json();
     const engineProducts = data.products || [];
 
-    // Map engine format → site FeaturedProduct format
     const products: FeaturedProduct[] = engineProducts.map((p: {
       pid: string; namePt: string; descPt: string; categoryPt: string;
       tagPt?: string; accent?: string; image: string; price: number;
@@ -88,7 +76,6 @@ export async function GET() {
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    console.error("[featured] Engine proxy error:", message);
     return NextResponse.json({ error: message, products: [] }, { status: 500 });
   }
 }

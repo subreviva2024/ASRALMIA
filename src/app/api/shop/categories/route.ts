@@ -1,10 +1,5 @@
 import { NextResponse } from "next/server";
 
-/**
- * GET /api/cj/categories
- * Returns product categories from the ASTRALMIA engine catalog.
- */
-
 const ENGINE_URL = process.env.ASTRALMIA_ENGINE_URL || "http://localhost:4002";
 
 export async function GET() {
@@ -23,7 +18,6 @@ export async function GET() {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
 
-    // Fallback: return static categories if engine is unavailable
     try {
       const { getCategories } = await import("@/lib/cj");
       const categories = await getCategories();

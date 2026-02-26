@@ -5,7 +5,7 @@ import Link from "next/link";
 
 /**
  * Legacy product page — redirects to the main shop.
- * All products are now served from /loja/cj/[pid] with real CJ data.
+ * All products are now served from /loja/produto/[pid].
  */
 export default function LegacyProductPage() {
   const router = useRouter();

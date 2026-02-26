@@ -17,7 +17,7 @@ interface ProductResponse {
   shipping: CJFreightOption[];
 }
 
-export default function CJProductPage() {
+export default function ProductPage() {
   const params = useParams();
   const pid = params.pid as string;
   const { addItem, items } = useCart();
@@ -30,7 +30,7 @@ export default function CJProductPage() {
 
   useEffect(() => {
     if (!pid) return;
-    fetch(`/api/cj/product/${pid}`)
+    fetch(`/api/shop/product/${pid}`)
       .then((r) => r.json())
       .then((json) => {
         if (json.error) throw new Error(json.error);
@@ -81,18 +81,14 @@ export default function CJProductPage() {
 
   const { product, variants, shipping } = data;
 
-  // Translate to Portuguese
   const translation = translateProduct(product.productNameEn || product.productName);
 
-  // Cheapest shipping option
   const cheapest = shipping.length
     ? shipping.reduce((a, b) => (safeFloat(a.logisticPrice) <= safeFloat(b.logisticPrice) ? a : b))
     : null;
 
-  // Calculate EUR pricing with 2.5x markup
   const pricing = analyzePricing(safeFloat(product.sellPrice), cheapest, 2.5);
 
-  // Variant display price
   const variantPrice = selectedVariant
     ? analyzePricing(safeFloat(selectedVariant.variantSellPrice) || safeFloat(product.sellPrice), cheapest, 2.5).suggestedPriceEur
     : pricing.suggestedPriceEur;
@@ -164,7 +160,6 @@ export default function CJProductPage() {
               )}
             </div>
 
-            {/* Variant image thumbnails */}
             {variants.length > 1 && (
               <div style={{ display: "flex", gap: "8px", marginTop: "12px", flexWrap: "wrap" }}>
                 {variants.slice(0, 6).map((v) => (
@@ -191,17 +186,14 @@ export default function CJProductPage() {
 
           {/* Right: Info */}
           <motion.div variants={fade} initial="hidden" animate="show" transition={{ duration: 0.6, delay: 0.15 }}>
-            {/* Category */}
             <p style={{ fontFamily: "'Inter'", fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: translation.accent || "#c9a84c", marginBottom: "16px" }}>
               {translation.categoryPt || product.categoryName || "Artefactos"}
             </p>
 
-            {/* Name */}
             <h1 style={{ fontFamily: "'Cormorant Garamond',Georgia,serif", fontSize: "clamp(28px,4vw,42px)", fontWeight: 300, color: "#f0ebe2", lineHeight: 1.15, marginBottom: "28px" }}>
               {translation.namePt}
             </h1>
 
-            {/* Price */}
             <div style={{ display: "flex", alignItems: "baseline", gap: "20px", marginBottom: "32px" }}>
               <p style={{ fontFamily: "'Inter'", fontSize: "28px", fontWeight: 400, color: "#c9a84c", letterSpacing: "0.03em" }}>
                 € {variantPrice.toFixed(2).replace(".", ",")}
@@ -211,7 +203,6 @@ export default function CJProductPage() {
               </p>
             </div>
 
-            {/* Variants dropdown */}
             {variants.length > 1 && (
               <div style={{ marginBottom: "32px" }}>
                 <p style={{ fontFamily: "'Inter'", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,235,226,0.45)", marginBottom: "12px" }}>
@@ -237,7 +228,6 @@ export default function CJProductPage() {
               </div>
             )}
 
-            {/* Shipping info */}
             {shipping.length > 0 && (
               <div style={{
                 marginBottom: "32px",
@@ -261,7 +251,6 @@ export default function CJProductPage() {
               </div>
             )}
 
-            {/* Add to cart button */}
             <button
               onClick={handleAddToCart}
               disabled={!selectedVariant}
@@ -284,7 +273,6 @@ export default function CJProductPage() {
               {added ? "✦ Adicionado ao Carrinho" : "Adicionar ao Carrinho"}
             </button>
 
-            {/* View cart shortcut */}
             {isInCart && (
               <Link
                 href="/carrinho"
@@ -300,7 +288,6 @@ export default function CJProductPage() {
               </Link>
             )}
 
-            {/* Trust signals */}
             <div style={{ marginTop: "36px", paddingTop: "28px", borderTop: "1px solid rgba(255,255,255,0.07)", display: "flex", gap: "24px", flexWrap: "wrap" }}>
               {[
                 { icon: "✦", text: "Pagamento Seguro" },
@@ -316,7 +303,7 @@ export default function CJProductPage() {
           </motion.div>
         </div>
 
-        {/* Description section */}
+        {/* Description */}
         <motion.section
           variants={fade}
           initial="hidden"
@@ -331,17 +318,14 @@ export default function CJProductPage() {
           <p style={{ fontFamily: "'Inter'", fontSize: "14px", fontWeight: 300, color: "rgba(240,235,226,0.6)", lineHeight: 1.9, maxWidth: "720px", marginBottom: "32px" }}>
             {translation.descPt}
           </p>
-          {/* Show raw CJ images gallery if description has them */}
           {product.description && (() => {
-            // Sanitize: strip all tags except <img>, remove scripts/iframes/event handlers
             const sanitized = product.description
               .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
               .replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, "")
-              .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "") // remove event handlers
-              .replace(/<(?!img\s|br\s|br>)[^>]*>/gi, " ") // keep only <img> and <br>
+              .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "")
+              .replace(/<(?!img\s|br\s|br>)[^>]*>/gi, " ")
               .replace(/\s+/g, " ")
               .trim();
-            // Only show if there are actual images
             if (!/<img/i.test(sanitized)) return null;
             return (
               <div

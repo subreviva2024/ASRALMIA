@@ -113,7 +113,7 @@ export default function SourcingPage() {
           markup: markup,
           maxShip: "5",
         });
-        const res = await fetch(`/api/cj/products?${params}`);
+        const res = await fetch(`/api/shop/products?${params}`);
         const data: SearchResult = await res.json();
         if (data.error) throw new Error(data.error);
         setResults(data);
@@ -145,7 +145,7 @@ export default function SourcingPage() {
           params.set("category", mode);
         }
         setScanProgress(`A procurar em ${mode === "top" ? "top keywords" : CATEGORY_LABELS[mode] || mode}...`);
-        const res = await fetch(`/api/cj/scan?${params}`);
+        const res = await fetch(`/api/shop/scan?${params}`);
         const data: ScanResult = await res.json();
         if ((data as unknown as { error: string }).error) {
           throw new Error((data as unknown as { error: string }).error);

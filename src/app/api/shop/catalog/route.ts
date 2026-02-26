@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-/**
- * GET /api/cj/catalog — Proxies to ASTRALMIA Engine
- * 
- * The autonomous engine maintains a pre-scanned, filtered, translated catalog.
- * This route simply proxies to the engine and maps the data to the site format.
- */
-
 const ENGINE_URL = process.env.ASTRALMIA_ENGINE_URL || "http://localhost:4002";
-
-// ── Types ───────────────────────────────────────────────────────────────────
 
 export interface CatalogProduct {
   pid: string;
@@ -28,7 +19,6 @@ export interface CatalogProduct {
   opportunityScore: number;
 }
 
-// Category key → engine categoryPt mapping
 const CATEGORY_MAP: Record<string, string> = {
   cristais:  "Cristais",
   tarot:     "Tarot",
@@ -42,14 +32,11 @@ const CATEGORY_MAP: Record<string, string> = {
   aromaterapia: "Aromaterapia",
 };
 
-// ── Route handler ────────────────────────────────────────────────────────────
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const category = searchParams.get("category"); // e.g. "cristais", "tarot", or null for all
+    const category = searchParams.get("category");
 
-    // Build engine URL with filters
     const engineParams = new URLSearchParams();
     if (category && CATEGORY_MAP[category]) {
       engineParams.set("category", CATEGORY_MAP[category]);
@@ -59,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     const engineUrl = `${ENGINE_URL}/catalog?${engineParams.toString()}`;
     const res = await fetch(engineUrl, {
-      next: { revalidate: 300 }, // ISR: revalidate every 5 min
+      next: { revalidate: 300 },
       headers: { "Accept": "application/json" },
     });
 
@@ -70,7 +57,6 @@ export async function GET(request: NextRequest) {
     const data = await res.json();
     const engineProducts = data.products || [];
 
-    // Map engine format → site CatalogProduct format
     const products: CatalogProduct[] = engineProducts.map((p: {
       pid: string; namePt: string; descPt: string; categoryPt: string;
       tagPt?: string; accent?: string; image: string; price: number;
@@ -105,7 +91,6 @@ export async function GET(request: NextRequest) {
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    console.error("[catalog] Engine proxy error:", message);
     return NextResponse.json({ error: message, products: [] }, { status: 500 });
   }
 }

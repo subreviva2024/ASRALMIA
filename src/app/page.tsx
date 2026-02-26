@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import type { FeaturedProduct } from "@/app/api/cj/featured/route";
+import type { FeaturedProduct } from "@/app/api/shop/featured/route";
 
 // Deterministic star field – safe for SSR/hydration
 const starField = Array.from({ length: 90 }, (_, i) => ({
@@ -30,8 +30,7 @@ const elementos = [
   { symbol: "🜁", name: "Ar", lat: "Aer", desc: "O sopro do intelecto, da comunicação e das ligações invisíveis. Gémeos, Balança, Aquário.", accent: "#c9c4a8", gradient: "rgba(201,196,168,0.08)" },
 ];
 
-// Featured products come from /api/cj/featured (real CJ Dropshipping)
-// Gradients used as fallback when CJ image is loading or unavailable
+// Gradients used as fallback when product image is loading or unavailable
 const FALLBACK_GRADIENTS = [
   { gradient: "linear-gradient(135deg, #1a1500 0%, #2d2200 100%)", accent: "#c9a84c" },
   { gradient: "linear-gradient(135deg, #0e0a1a 0%, #1a1030 100%)", accent: "#8b6fc9" },
@@ -77,7 +76,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/cj/featured")
+    fetch("/api/shop/featured")
       .then((r) => r.json())
       .then((data) => {
         if (data.products?.length) setFeaturedProducts(data.products);
@@ -401,7 +400,7 @@ export default function Home() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: i * 0.08 }}
                 >
-                  <Link href={`/loja/cj/${p.pid}`} style={{ textDecoration: "none", display: "block" }}>
+                  <Link href={`/loja/produto/${p.pid}`} style={{ textDecoration: "none", display: "block" }}>
                     <div
                       className="product-card"
                       style={{ cursor: "pointer", transition: "transform 0.3s ease" }}

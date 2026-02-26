@@ -42,8 +42,8 @@ export default function LojaPage() {
   const fetchProducts = useCallback((category: string) => {
     setLoading(true);
     const url = category === "all"
-      ? "/api/cj/catalog"
-      : `/api/cj/catalog?category=${category}`;
+      ? "/api/shop/catalog"
+      : `/api/shop/catalog?category=${category}`;
 
     fetch(url)
       .then((r) => r.json())
@@ -158,7 +158,7 @@ export default function LojaPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: Math.min(i, 8) * 0.06 }}
               >
-                <Link href={`/loja/cj/${p.pid}`} style={{ textDecoration: "none", display: "block" }}>
+                <Link href={`/loja/produto/${p.pid}`} style={{ textDecoration: "none", display: "block" }}>
                   <div
                     style={{ background: "#0e0e1a", overflow: "hidden", transition: "transform 0.3s ease", cursor: "pointer" }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-3px)"; }}
