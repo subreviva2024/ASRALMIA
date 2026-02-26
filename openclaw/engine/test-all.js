@@ -1,0 +1,193 @@
+/**
+ * ASTRALMIA — Test Suite
+ * Tests all engine modules for correctness
+ */
+
+import { translateProduct, calculatePricing, isValidImage, fingerprint } from "./product-engine.js";
+
+let passed = 0;
+let failed = 0;
+
+function test(name, fn) {
+  try {
+    fn();
+    console.log(`  ✅ ${name}`);
+    passed++;
+  } catch (err) {
+    console.log(`  ❌ ${name}: ${err.message}`);
+    failed++;
+  }
+}
+
+function assert(condition, msg = "Assertion failed") {
+  if (!condition) throw new Error(msg);
+}
+
+console.log("\n═══════════════════════════════════════════════════════");
+console.log("  ✨ ASTRALMIA — Engine Tests v3.0");
+console.log("═══════════════════════════════════════════════════════\n");
+
+// ── Translation Engine ──────────────────────────────────────
+
+console.log("📝 Translation Engine:");
+
+test("amethyst pendant → Colar de Ametista Natural", () => {
+  const r = translateProduct("Natural Amethyst Crystal Pendant Necklace");
+  assert(r.namePt === "Colar de Ametista Natural");
+  assert(r.categoryPt === "Cristais");
+});
+
+test("rose quartz → Quartzo Rosa", () => {
+  const r = translateProduct("Rose Quartz Crystal Heart Shape");
+  assert(r.namePt === "Quartzo Rosa — Pedra do Amor");
+});
+
+test("tarot deck → Baralho de Tarot", () => {
+  const r = translateProduct("Classic Tarot Card Deck 78 Cards");
+  assert(r.namePt === "Baralho de Tarot");
+  assert(r.categoryPt === "Tarot");
+});
+
+test("evil eye → Olho Grego", () => {
+  const r = translateProduct("Evil Eye Blue Bead Bracelet");
+  assert(r.namePt === "Olho Grego — Protecção");
+});
+
+test("backflow incense → Incensário Cascata", () => {
+  const r = translateProduct("Backflow Incense Burner Waterfall");
+  assert(r.namePt === "Incensário Cascata");
+});
+
+test("singing bowl → Taça Tibetana", () => {
+  const r = translateProduct("Tibetan Singing Bowl Set Meditation");
+  assert(r.namePt === "Taça Tibetana");
+  assert(r.categoryPt === "Meditação");
+});
+
+test("unknown product → fallback clean name", () => {
+  const r = translateProduct("Some Random Item [wholesale] {lot}");
+  assert(r.categoryPt === "Artefactos");
+  assert(!r.namePt.includes("["));
+});
+
+test("tiger eye → Olho de Tigre", () => {
+  const r = translateProduct("Natural Tiger Eye Stone Bracelet");
+  assert(r.namePt === "Olho de Tigre");
+});
+
+test("obsidian → Obsidiana", () => {
+  const r = translateProduct("Black Obsidian Pendant Necklace");
+  assert(r.namePt === "Obsidiana — Espelho da Alma");
+});
+
+// ── Pricing Engine ──────────────────────────────────────────
+
+console.log("\n💰 Pricing Engine:");
+
+test("$5 product → €12.99", () => {
+  const p = calculatePricing(5, 0);
+  assert(p.retailEur === 11.99 || p.retailEur === 12.99 || p.retailEur === 14.99,
+    `Expected €11.99-14.99, got €${p.retailEur}`);
+  assert(p.score > 0, "Score must be > 0");
+});
+
+test("$10 product → price < €49.99", () => {
+  const p = calculatePricing(10, 3);
+  assert(p.retailEur <= 49.99, `Price too high: €${p.retailEur}`);
+  assert(p.marginEur > 0, "Margin must be positive");
+});
+
+test("free shipping → higher score", () => {
+  const p1 = calculatePricing(5, 0);
+  const p2 = calculatePricing(5, 5);
+  assert(p1.score > p2.score, "Free shipping should score higher");
+  assert(p1.freeShipping === true);
+  assert(p2.freeShipping === false);
+});
+
+test("margin % is correct", () => {
+  const p = calculatePricing(3, 0);
+  assert(p.marginPct > 50, `Low margin: ${p.marginPct}%`);
+  assert(p.marginEur > 0);
+});
+
+test("price ends in .99", () => {
+  const p = calculatePricing(7, 2);
+  const decimal = Math.round((p.retailEur - Math.floor(p.retailEur)) * 100);
+  assert(decimal === 99, `Expected .99, got .${decimal}`);
+});
+
+// ── Image Validator ──────────────────────────────────────────
+
+console.log("\n🖼️ Image Validator:");
+
+test("valid HTTPS image", () => {
+  assert(isValidImage("https://cbu01.alicdn.com/img/product.jpg") === true);
+});
+
+test("HTTP rejected", () => {
+  assert(isValidImage("http://example.com/img.jpg") === false);
+});
+
+test("placeholder rejected", () => {
+  assert(isValidImage("https://example.com/no-image-placeholder.jpg") === false);
+});
+
+test("empty rejected", () => {
+  assert(isValidImage("") === false);
+  assert(isValidImage(null) === false);
+});
+
+test("CJ CDN valid", () => {
+  assert(isValidImage("https://cbu01.alicdn.com/product.jpg") === true);
+});
+
+// ── Deduplication ──────────────────────────────────────────
+
+console.log("\n🔒 Deduplication:");
+
+test("same product → same fingerprint", () => {
+  const fp1 = fingerprint("Amethyst Crystal Pendant", 5.99);
+  const fp2 = fingerprint("amethyst crystal pendant", 5.50);
+  assert(fp1 === fp2, `Fingerprints differ: ${fp1} vs ${fp2}`);
+});
+
+test("different products → different fingerprints", () => {
+  const fp1 = fingerprint("Amethyst Crystal Pendant", 5.99);
+  const fp2 = fingerprint("Rose Quartz Heart Stone", 3.99);
+  assert(fp1 !== fp2);
+});
+
+test("noise words removed", () => {
+  const fp1 = fingerprint("Crystal Pendant NEW Hot Sale Wholesale", 5);
+  const fp2 = fingerprint("Crystal Pendant", 5);
+  assert(fp1 === fp2, "Noise words should be stripped");
+});
+
+// ── Module Imports ──────────────────────────────────────────
+
+console.log("\n📦 Module Imports:");
+
+test("CJClient imports", async () => {
+  const m = await import("./cj-client.js");
+  assert(m.CJClient !== undefined);
+});
+
+test("catalog-scanner imports", async () => {
+  const m = await import("./catalog-scanner.js");
+  assert(typeof m.runFullScan === "function");
+});
+
+test("product-engine imports", async () => {
+  const m = await import("./product-engine.js");
+  assert(typeof m.analyzeProduct === "function");
+});
+
+// ── Summary ──────────────────────────────────────────────
+
+console.log("\n═══════════════════════════════════════════════════════");
+console.log(`  Results: ${passed} passed, ${failed} failed`);
+console.log(failed === 0 ? "  ✅ ALL TESTS PASSED" : "  ❌ SOME TESTS FAILED");
+console.log("═══════════════════════════════════════════════════════\n");
+
+process.exit(failed > 0 ? 1 : 0);

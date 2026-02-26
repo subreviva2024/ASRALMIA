@@ -1,0 +1,54 @@
+{
+  "id": "cj-dropshipping",
+  "name": "CJ Dropshipping — ASTRALMIA Integration",
+  "version": "2.0.0",
+  "description": "Full CJ Dropshipping API integration for ASTRALMIA esoteric store. Product search, pricing, inventory, shipping, orders, and tracking.",
+  "author": "ASTRALMIA",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "apiKey": {
+        "type": "string",
+        "description": "CJ Dropshipping API Key"
+      },
+      "email": {
+        "type": "string",
+        "description": "CJ account email (alternative to apiKey)"
+      },
+      "password": {
+        "type": "string",
+        "description": "CJ account password (alternative to apiKey)"
+      },
+      "defaultCountry": {
+        "type": "string",
+        "default": "PT",
+        "description": "Default shipping destination country code"
+      },
+      "defaultMarkup": {
+        "type": "number",
+        "default": 2.5,
+        "description": "Default price markup multiplier"
+      },
+      "maxCjPriceUsd": {
+        "type": "number",
+        "default": 20,
+        "description": "Maximum CJ wholesale price in USD"
+      },
+      "maxRetailEur": {
+        "type": "number",
+        "default": 49.99,
+        "description": "Maximum retail price in EUR"
+      },
+      "usdToEur": {
+        "type": "number",
+        "default": 0.92,
+        "description": "USD to EUR conversion rate"
+      }
+    }
+  },
+  "uiHints": {
+    "apiKey": { "label": "CJ API Key", "sensitive": true },
+    "email": { "label": "CJ Email" },
+    "password": { "label": "CJ Password", "sensitive": true }
+  }
+}

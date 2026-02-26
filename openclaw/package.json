@@ -1,0 +1,19 @@
+{
+  "name": "astralmia-openclaw",
+  "version": "3.0.0",
+  "description": "ASTRALMIA — OpenClaw Sales Bot with CJ Dropshipping (24/7 Autonomous)",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.0.0" },
+  "scripts": {
+    "start": "node engine/main.js",
+    "catalog:update": "node engine/catalog-updater.js",
+    "catalog:scan": "node engine/catalog-scanner.js",
+    "health": "node engine/health-check.js",
+    "test": "node engine/test-all.js",
+    "deploy": "bash deploy.sh"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.0"
+  }
+}

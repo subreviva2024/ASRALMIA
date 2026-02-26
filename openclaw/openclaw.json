@@ -1,0 +1,107 @@
+{
+  "agents": {
+    "defaults": {
+      "workspace": "~/.openclaw/workspace",
+      "model": {
+        "primary": "anthropic/claude-sonnet-4-5",
+        "fallbacks": ["openai/gpt-4.1-mini"]
+      },
+      "userTimezone": "Europe/Lisbon",
+      "blockStreamingDefault": "off",
+      "heartbeat": { "every": "30m", "target": "last" }
+    },
+    "list": [
+      {
+        "id": "caela",
+        "default": true,
+        "workspace": "~/.openclaw/workspace"
+      }
+    ]
+  },
+  "gateway": {
+    "port": 18789,
+    "bind": "lan",
+    "auth": {
+      "mode": "token",
+      "token": "${OPENCLAW_AUTH_TOKEN}"
+    },
+    "controlUi": { "enabled": true },
+    "reload": { "mode": "hybrid" }
+  },
+  "tools": {
+    "profile": "full",
+    "exec": { "timeoutSec": 300 },
+    "web": {
+      "search": { "apiKey": "${BRAVE_API_KEY}" },
+      "fetch": { "enabled": true }
+    },
+    "elevated": { "enabled": true }
+  },
+  "plugins": {
+    "enabled": true,
+    "load": {
+      "paths": ["~/.openclaw/extensions/cj-dropshipping"]
+    },
+    "entries": {
+      "cj-dropshipping": {
+        "enabled": true,
+        "config": {
+          "apiKey": "${CJ_API_KEY}",
+          "email": "${CJ_EMAIL}",
+          "password": "${CJ_PASSWORD}",
+          "defaultCountry": "PT",
+          "defaultMarkup": 2.5,
+          "maxCjPriceUsd": 20,
+          "maxRetailEur": 49.99,
+          "usdToEur": 0.92
+        }
+      }
+    }
+  },
+  "session": {
+    "dmScope": "per-channel-peer",
+    "reset": { "mode": "daily", "atHour": 4 }
+  },
+  "env": {
+    "CJ_API_KEY": "${CJ_API_KEY}",
+    "CJ_EMAIL": "${CJ_EMAIL}",
+    "CJ_PASSWORD": "${CJ_PASSWORD}",
+    "CJ_BASE_URL": "https://developers.cjdropshipping.com/api2.0/v1"
+  },
+  "hooks": {
+    "enabled": true,
+    "token": "${WEBHOOK_SECRET}",
+    "path": "/hooks",
+    "mappings": [
+      {
+        "match": { "path": "cj-order" },
+        "action": "agent",
+        "agentId": "caela",
+        "deliver": true,
+        "messageTemplate": "CJ Order Update: {{params.cjOrderId}} Status: {{params.orderStatus}}"
+      },
+      {
+        "match": { "path": "cj-product" },
+        "action": "agent",
+        "agentId": "caela",
+        "deliver": true,
+        "messageTemplate": "CJ Product Update: {{params.productName}} ({{params.pid}})"
+      },
+      {
+        "match": { "path": "cj-logistics" },
+        "action": "agent",
+        "agentId": "caela",
+        "deliver": true,
+        "messageTemplate": "CJ Shipping: Order {{params.orderId}} Tracking: {{params.trackingNumber}}"
+      }
+    ]
+  },
+  "ui": {
+    "seamColor": "#9b7cd4",
+    "assistant": {
+      "name": "Caela",
+      "avatar": "✨"
+    }
+  },
+  "browser": { "enabled": true, "defaultProfile": "chrome" }
+}
