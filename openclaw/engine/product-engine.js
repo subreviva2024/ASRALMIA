@@ -25,6 +25,49 @@ const MAX_RETAIL = 49.99;
 const MIN_SCORE = 45;
 
 // ═══════════════════════════════════════════════════════════
+// Relevance Filter — ASTRALMIA niche keywords
+// Products MUST contain at least one of these in their name
+// ═══════════════════════════════════════════════════════════
+
+const RELEVANCE_KEYWORDS = [
+  // Cristais & Pedras
+  "crystal", "quartz", "amethyst", "tourmaline", "obsidian", "lapis", "lazuli",
+  "tiger eye", "moonstone", "gemstone", "stone", "agate", "jade", "opal",
+  "citrine", "garnet", "aquamarine", "malachite", "fluorite", "selenite",
+  "aventurine", "jasper", "cornelian", "carnelian", "sodalite", "onyx",
+  "mineral", "healing stone", "chakra stone",
+  // Tarot & Adivinhação
+  "tarot", "oracle", "divination", "pendulum", "rune", "runes",
+  // Incenso & Purificação
+  "incense", "sage", "smudge", "palo santo", "burner", "censer",
+  // Meditação
+  "singing bowl", "tibetan bowl", "mala", "meditation", "prayer bead",
+  "yoga", "zen",
+  // Joias Espirituais
+  "evil eye", "hamsa", "chakra", "zodiac", "moon phase", "lotus",
+  "spiritual", "amulet", "talisman", "pendant", "necklace", "bracelet",
+  "ring", "earring", "jewelry", "jewellery",
+  // Decoração Espiritual
+  "dreamcatcher", "buddha", "mandala", "sacred geometry", "tree of life",
+  "om", "yin yang", "goddess", "angel", "fairy", "witch", "wicca",
+  "mystical", "celestial", "cosmic", "astral",
+  // Velas & Aromaterapia
+  "candle", "ritual", "spell", "aromatherapy", "essential oil", "diffuser",
+  "oil burner",
+  // Geral Espiritual
+  "esoteric", "occult", "mystic", "metaphysical", "horoscope", "astrology",
+  "third eye", "energy", "reiki", "feng shui",
+];
+
+/**
+ * Check if a product name is relevant to ASTRALMIA's spiritual niche
+ */
+function isRelevantProduct(nameEn) {
+  const lower = (nameEn || "").toLowerCase();
+  return RELEVANCE_KEYWORDS.some(kw => lower.includes(kw));
+}
+
+// ═══════════════════════════════════════════════════════════
 // Translation Engine (34 rules + generic fallback)
 // ═══════════════════════════════════════════════════════════
 
@@ -166,6 +209,9 @@ export async function analyzeProduct(cj, rawProduct, seenFingerprints = new Set(
 
   // ── Gate 1: Price ──
   if (cjPrice <= 0 || cjPrice > MAX_CJ_PRICE) return null;
+
+  // ── Gate 1.5: Relevance — must be spiritual/esoteric niche ──
+  if (!isRelevantProduct(nameEn)) return null;
 
   // ── Gate 2: Image quality ──
   if (!isValidImage(image)) return null;
